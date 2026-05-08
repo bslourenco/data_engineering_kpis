@@ -3,56 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Execuções — DataX Gold PRD</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <title>Data Engineering KPIs — Plataforma de Dados</title>
     <style>
         :root {
             --bg-primary: #0f1117;
-            --bg-secondary: #1a1d2e;
             --bg-card: #1e2235;
             --text-primary: #e8eaed;
             --text-secondary: #9aa0b4;
             --accent-blue: #4f8cff;
-            --accent-green: #34d399;
-            --accent-red: #f87171;
-            --accent-yellow: #fbbf24;
             --accent-purple: #a78bfa;
             --border: #2d3148;
             --shadow: 0 4px 24px rgba(0,0,0,0.3);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            line-height: 1.6;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            max-width: 700px;
+            width: 100%;
             padding: 2rem;
         }
 
         header {
             text-align: center;
             margin-bottom: 2.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
         }
 
         header h1 {
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.5rem;
         }
 
         header p {
@@ -60,477 +50,69 @@
             font-size: 0.95rem;
         }
 
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.2rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .kpi-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s;
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .kpi-value {
-            font-size: 2.4rem;
-            font-weight: 800;
-            margin-bottom: 0.3rem;
-        }
-
-        .kpi-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .kpi-total .kpi-value { color: var(--accent-blue); }
-        .kpi-success .kpi-value { color: var(--accent-green); }
-        .kpi-failed .kpi-value { color: var(--accent-red); }
-        .kpi-rate .kpi-value { color: var(--accent-purple); }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .chart-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-        }
-
-        .chart-card h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text-secondary);
-        }
-
-        .chart-full {
-            grid-column: 1 / -1;
-        }
-
-        .table-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2.5rem;
-            box-shadow: var(--shadow);
-            overflow-x: auto;
-        }
-
-        .table-section h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text-secondary);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th, td {
-            padding: 0.75rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.7rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .badge-healthy {
-            background: rgba(52, 211, 153, 0.15);
-            color: var(--accent-green);
-        }
-
-        .badge-warning {
-            background: rgba(251, 191, 36, 0.15);
-            color: var(--accent-yellow);
-        }
-
-        .badge-critical {
-            background: rgba(248, 113, 113, 0.15);
-            color: var(--accent-red);
-        }
-
-        .failures-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2.5rem;
-            box-shadow: var(--shadow);
-        }
-
-        .failures-section h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--accent-red);
-        }
-
-        .failure-item {
+        .dashboard-list {
+            list-style: none;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 1rem;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .failure-item:last-child {
-            border-bottom: none;
-        }
-
-        .failure-dag {
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            word-break: break-all;
-        }
-
-        .failure-stats {
-            display: flex;
+            flex-direction: column;
             gap: 1rem;
-            align-items: center;
         }
 
-        .failure-count {
-            font-weight: 700;
-            color: var(--accent-red);
+        .dashboard-link {
+            display: block;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, border-color 0.2s;
         }
 
-        .failure-rate {
-            font-size: 0.8rem;
+        .dashboard-link:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+        }
+
+        .dashboard-link h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--accent-blue);
+        }
+
+        .dashboard-link p {
+            font-size: 0.85rem;
             color: var(--text-secondary);
         }
 
         footer {
             text-align: center;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
+            margin-top: 3rem;
             color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-
-        footer strong {
-            color: var(--text-primary);
-        }
-
-        @media print {
-            body {
-                background: #fff;
-                color: #1a1a1a;
-            }
-            .kpi-card, .chart-card, .table-section, .failures-section {
-                background: #f8f9fa;
-                border: 1px solid #dee2e6;
-                box-shadow: none;
-            }
-            .kpi-total .kpi-value { color: #2563eb; }
-            .kpi-success .kpi-value { color: #059669; }
-            .kpi-failed .kpi-value { color: #dc2626; }
-            .kpi-rate .kpi-value { color: #7c3aed; }
-            th { color: #6b7280; }
-            td { color: #1a1a1a; }
-            header { border-bottom-color: #dee2e6; }
-            footer { border-top-color: #dee2e6; color: #6b7280; }
-        }
-
-        @media (max-width: 768px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 1rem;
-            }
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>📊 Dashboard de Execuções — DataX Gold PRD</h1>
-            <p>Ambiente: datax-gold-prd | Últimos 7 dias | Atualizado em 07/05/2026 08:46 (UTC-3)</p>
+            <h1>📊 Data Engineering KPIs</h1>
+            <p>Dashboards e indicadores da Plataforma de Dados</p>
         </header>
 
-        <!-- KPIs -->
-        <div class="kpi-grid">
-            <div class="kpi-card kpi-total">
-                <div class="kpi-value">522</div>
-                <div class="kpi-label">Total de Execuções</div>
-            </div>
-            <div class="kpi-card kpi-success">
-                <div class="kpi-value">508</div>
-                <div class="kpi-label">Sucesso</div>
-            </div>
-            <div class="kpi-card kpi-failed">
-                <div class="kpi-value">13</div>
-                <div class="kpi-label">Falhas</div>
-            </div>
-            <div class="kpi-card kpi-rate">
-                <div class="kpi-value">97.32%</div>
-                <div class="kpi-label">Taxa de Sucesso</div>
-            </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="charts-grid">
-            <div class="chart-card">
-                <h3>Execuções por Dia (Sucesso vs Falha)</h3>
-                <canvas id="barChart"></canvas>
-            </div>
-            <div class="chart-card">
-                <h3>Distribuição Geral</h3>
-                <canvas id="doughnutChart"></canvas>
-            </div>
-            <div class="chart-card chart-full">
-                <h3>Evolução da Taxa de Sucesso (%)</h3>
-                <canvas id="lineChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Daily Summary Table -->
-        <div class="table-section">
-            <h3>Resumo Diário</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Total</th>
-                        <th>Sucesso</th>
-                        <th>Falhas</th>
-                        <th>Taxa de Sucesso</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="dailyTable"></tbody>
-            </table>
-        </div>
-
-        <!-- Recurring Failures -->
-        <div class="failures-section">
-            <h3>⚠️ DAGs com Falhas Recorrentes (≥2 falhas em 7 dias)</h3>
-            <div id="failuresList"></div>
-        </div>
+        <ul class="dashboard-list">
+            <li>
+                <a href="dashboard_execucoes.html" class="dashboard-link">
+                    <h2>Dashboard de Execuções — DataX Gold PRD</h2>
+                    <p>KPIs, gráficos e resumo das execuções dos últimos 7 dias no ambiente MWAA datax-gold-prd.</p>
+                </a>
+            </li>
+        </ul>
 
         <footer>
-            <p>Gerado em <strong>07/05/2026 às 08:46 (UTC-3)</strong></p>
             <p>Plataforma de Dados — Cogna Educação</p>
         </footer>
     </div>
-
-    <script>
-        // Data from MWAA API
-        const dailyData = {
-            "2026-04-30": { "success": 58, "failed": 4 },
-            "2026-05-01": { "success": 57, "failed": 2 },
-            "2026-05-02": { "success": 57, "failed": 2 },
-            "2026-05-03": { "success": 65, "failed": 2 },
-            "2026-05-04": { "success": 70, "failed": 2 },
-            "2026-05-05": { "success": 73, "failed": 1 },
-            "2026-05-06": { "success": 73, "failed": 0 },
-            "2026-05-07": { "success": 55, "failed": 0 }
-        };
-
-        const recurringFailures = {
-            "business_dmc_campanhas_4026_blueprint_wf_crg_tgt_bi_captacao_analitico": {
-                "failures": 6, "total_runs": 11, "failure_rate": 54.5
-            },
-            "business_dmc_campanhas_3027_dim_pessoa_wf_crg_ent_pessoa_v1": {
-                "failures": 5, "total_runs": 9, "failure_rate": 55.6
-            },
-            "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_captacao": {
-                "failures": 2, "total_runs": 5, "failure_rate": 40.0
-            }
-        };
-
-        const labels = Object.keys(dailyData).map(d => {
-            const parts = d.split('-');
-            return `${parts[2]}/${parts[1]}`;
-        });
-        const successData = Object.values(dailyData).map(d => d.success || 0);
-        const failedData = Object.values(dailyData).map(d => d.failed || 0);
-
-        // Chart defaults
-        Chart.defaults.color = '#9aa0b4';
-        Chart.defaults.borderColor = '#2d3148';
-
-        // Bar Chart
-        new Chart(document.getElementById('barChart'), {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Sucesso',
-                        data: successData,
-                        backgroundColor: 'rgba(52, 211, 153, 0.8)',
-                        borderRadius: 4
-                    },
-                    {
-                        label: 'Falha',
-                        data: failedData,
-                        backgroundColor: 'rgba(248, 113, 113, 0.8)',
-                        borderRadius: 4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'top' } },
-                scales: {
-                    x: { stacked: true, grid: { display: false } },
-                    y: { stacked: true, beginAtZero: true }
-                }
-            }
-        });
-
-        // Doughnut Chart
-        new Chart(document.getElementById('doughnutChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Sucesso', 'Falha', 'Em execução'],
-                datasets: [{
-                    data: [508, 13, 1],
-                    backgroundColor: [
-                        'rgba(52, 211, 153, 0.85)',
-                        'rgba(248, 113, 113, 0.85)',
-                        'rgba(79, 140, 255, 0.85)'
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                cutout: '65%',
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
-            }
-        });
-
-        // Line Chart - Success Rate
-        const rateData = Object.values(dailyData).map(d => {
-            const total = (d.success || 0) + (d.failed || 0);
-            return total > 0 ? parseFloat(((d.success || 0) / total * 100).toFixed(1)) : 100;
-        });
-
-        new Chart(document.getElementById('lineChart'), {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Taxa de Sucesso (%)',
-                    data: rateData,
-                    borderColor: 'rgba(167, 139, 250, 1)',
-                    backgroundColor: 'rgba(167, 139, 250, 0.1)',
-                    fill: true,
-                    tension: 0.3,
-                    pointBackgroundColor: 'rgba(167, 139, 250, 1)',
-                    pointRadius: 5,
-                    pointHoverRadius: 7
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: {
-                        min: 85,
-                        max: 100,
-                        ticks: { callback: v => v + '%' }
-                    },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-
-        // Daily Table
-        const tableBody = document.getElementById('dailyTable');
-        Object.entries(dailyData).forEach(([date, data]) => {
-            const success = data.success || 0;
-            const failed = data.failed || 0;
-            const total = success + failed;
-            const rate = total > 0 ? (success / total * 100).toFixed(1) : '100.0';
-
-            let badgeClass, badgeText;
-            if (rate >= 97) {
-                badgeClass = 'badge-healthy';
-                badgeText = 'Saudável';
-            } else if (rate >= 90) {
-                badgeClass = 'badge-warning';
-                badgeText = 'Atenção';
-            } else {
-                badgeClass = 'badge-critical';
-                badgeText = 'Crítico';
-            }
-
-            const parts = date.split('-');
-            const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-
-            tableBody.innerHTML += `
-                <tr>
-                    <td>${formattedDate}</td>
-                    <td>${total}</td>
-                    <td>${success}</td>
-                    <td>${failed}</td>
-                    <td>${rate}%</td>
-                    <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-                </tr>
-            `;
-        });
-
-        // Recurring Failures
-        const failuresList = document.getElementById('failuresList');
-        Object.entries(recurringFailures).forEach(([dagId, stats]) => {
-            failuresList.innerHTML += `
-                <div class="failure-item">
-                    <span class="failure-dag">${dagId}</span>
-                    <div class="failure-stats">
-                        <span class="failure-count">${stats.failures} falhas</span>
-                        <span class="failure-rate">${stats.total_runs} execuções | ${stats.failure_rate}% taxa de falha</span>
-                    </div>
-                </div>
-            `;
-        });
-    </script>
 </body>
 </html>
