@@ -271,25 +271,25 @@
     <div class="container">
         <header>
             <h1>📊 Dashboard de Execuções MWAA</h1>
-            <p>Ambiente: datax-gold-prd | Período: 02/05/2026 – 08/05/2026 (7 dias)</p>
+            <p>Ambiente: datax-gold-prd | Período: 04/05/2026 – 11/05/2026 (7 dias)</p>
         </header>
 
         <!-- KPIs -->
         <div class="kpi-grid">
             <div class="kpi-card total">
-                <div class="kpi-value">491</div>
+                <div class="kpi-value">504</div>
                 <div class="kpi-label">Total de Execuções</div>
             </div>
             <div class="kpi-card success">
-                <div class="kpi-value">484</div>
+                <div class="kpi-value">500</div>
                 <div class="kpi-label">Sucesso</div>
             </div>
             <div class="kpi-card failed">
-                <div class="kpi-value">7</div>
+                <div class="kpi-value">2</div>
                 <div class="kpi-label">Falhas</div>
             </div>
             <div class="kpi-card rate">
-                <div class="kpi-value">98.57%</div>
+                <div class="kpi-value">99.21%</div>
                 <div class="kpi-label">Taxa de Sucesso</div>
             </div>
         </div>
@@ -320,6 +320,7 @@
                         <th>Total</th>
                         <th>Sucesso</th>
                         <th>Falhas</th>
+                        <th>Running</th>
                         <th>Taxa de Sucesso</th>
                         <th>Status</th>
                     </tr>
@@ -335,27 +336,26 @@
         </div>
 
         <footer>
-            <div class="timestamp">Gerado em: 08/05/2026 às 18:55 UTC</div>
+            <div class="timestamp">Gerado em: 11/05/2026 às 11:35 UTC</div>
             <div><strong>Plataforma de Dados — Cogna Educação</strong></div>
         </footer>
     </div>
 
     <script>
-        // Data
+        // Data from MWAA API - collected on 2026-05-11
         const dailyStats = {
-            "2026-05-02": { "success": 57, "failed": 2 },
-            "2026-05-03": { "success": 65, "failed": 2 },
-            "2026-05-04": { "success": 70, "failed": 2 },
-            "2026-05-05": { "success": 73, "failed": 1 },
-            "2026-05-06": { "success": 73, "failed": 0 },
-            "2026-05-07": { "success": 73, "failed": 0 },
-            "2026-05-08": { "success": 73, "failed": 0 }
+            "2026-05-04": { "success": 22, "failed": 1, "running": 0 },
+            "2026-05-05": { "success": 73, "failed": 1, "running": 0 },
+            "2026-05-06": { "success": 73, "failed": 0, "running": 0 },
+            "2026-05-07": { "success": 73, "failed": 0, "running": 0 },
+            "2026-05-08": { "success": 73, "failed": 0, "running": 0 },
+            "2026-05-09": { "success": 73, "failed": 0, "running": 0 },
+            "2026-05-10": { "success": 65, "failed": 0, "running": 1 },
+            "2026-05-11": { "success": 48, "failed": 0, "running": 1 }
         };
 
         const recurringFailures = {
-            "business_dmc_campanhas_3027_dim_pessoa_wf_crg_ent_pessoa_v1": 3,
-            "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_captacao": 2,
-            "business_dmc_campanhas_4026_blueprint_wf_crg_tgt_bi_captacao_analitico": 2
+            "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_captacao": 2
         };
 
         const days = Object.keys(dailyStats);
@@ -410,7 +410,7 @@
             data: {
                 labels: ['Sucesso', 'Falha'],
                 datasets: [{
-                    data: [484, 7],
+                    data: [500, 2],
                     backgroundColor: ['rgba(102, 187, 106, 0.8)', 'rgba(239, 83, 80, 0.8)'],
                     borderColor: ['rgba(102, 187, 106, 1)', 'rgba(239, 83, 80, 1)'],
                     borderWidth: 2,
@@ -453,7 +453,7 @@
                 responsive: true,
                 plugins: { legend: { position: 'top' } },
                 scales: {
-                    y: { min: 85, max: 100, ticks: { callback: v => v + '%' } },
+                    y: { min: 90, max: 100, ticks: { callback: v => v + '%' } },
                     x: { grid: { display: false } }
                 }
             }
@@ -464,8 +464,10 @@
         days.forEach(day => {
             const s = dailyStats[day].success || 0;
             const f = dailyStats[day].failed || 0;
-            const total = s + f;
-            const rate = total > 0 ? (s / total * 100).toFixed(2) : '100.00';
+            const r = dailyStats[day].running || 0;
+            const total = s + f + r;
+            const completedTotal = s + f;
+            const rate = completedTotal > 0 ? (s / completedTotal * 100).toFixed(2) : '100.00';
             const rateNum = parseFloat(rate);
 
             let badgeClass, badgeText;
@@ -482,6 +484,7 @@
                     <td>${total}</td>
                     <td>${s}</td>
                     <td>${f}</td>
+                    <td>${r}</td>
                     <td>${rate}%</td>
                     <td><span class="badge ${badgeClass}">${badgeText}</span></td>
                 </tr>
@@ -490,9 +493,12 @@
 
         // Recurring Failures
         const failuresList = document.getElementById('failuresList');
-        Object.entries(recurringFailures)
-            .sort((a, b) => b[1] - a[1])
-            .forEach(([dag, count]) => {
+        const failureEntries = Object.entries(recurringFailures).sort((a, b) => b[1] - a[1]);
+        
+        if (failureEntries.length === 0) {
+            failuresList.innerHTML = '<p style="color: var(--accent-green); padding: 0.75rem 1rem;">✅ Nenhuma DAG com falhas recorrentes no período.</p>';
+        } else {
+            failureEntries.forEach(([dag, count]) => {
                 failuresList.innerHTML += `
                     <div class="failure-item">
                         <span class="dag-name">${dag}</span>
@@ -500,6 +506,7 @@
                     </div>
                 `;
             });
+        }
     </script>
 </body>
 </html>
