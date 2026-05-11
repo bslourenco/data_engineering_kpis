@@ -85,7 +85,7 @@
             <span>📅 Período: 04/05/2026 a 11/05/2026</span>
             <span>🏢 Ambiente: datax-gold-prd</span>
             <span>☁️ AWS Account: 785100678825</span>
-            <span>🕐 Gerado em: 11/05/2026 08:38 BRT</span>
+            <span>🕐 Gerado em: 11/05/2026 16:43 BRT</span>
         </div>
     </div>
 
@@ -93,11 +93,11 @@
         <!-- KPI Cards -->
         <div class="kpi-grid">
             <div class="kpi-card primary">
-                <div class="kpi-value">33</div>
+                <div class="kpi-value">37</div>
                 <div class="kpi-label">Total de Execuções</div>
             </div>
             <div class="kpi-card success">
-                <div class="kpi-value">93.9%</div>
+                <div class="kpi-value">94.6%</div>
                 <div class="kpi-label">Taxa de Sucesso</div>
             </div>
             <div class="kpi-card danger">
@@ -105,7 +105,7 @@
                 <div class="kpi-label">Falhas no Período</div>
             </div>
             <div class="kpi-card warning">
-                <div class="kpi-value">18min</div>
+                <div class="kpi-value">17min</div>
                 <div class="kpi-label">Duração Média Geral</div>
             </div>
         </div>
@@ -167,7 +167,7 @@
 
         <!-- Timeline -->
         <div class="timeline-section">
-            <h3>🕐 Linha do Tempo — Execuções Mais Recentes (09/05/2026)</h3>
+            <h3>🕐 Linha do Tempo — Execuções Mais Recentes (11/05/2026)</h3>
             <div class="chart-container" style="height: 200px;">
                 <canvas id="chartTimeline"></canvas>
             </div>
@@ -180,13 +180,14 @@
 
     <script>
     // ============================================================
-    // DATA (atualizado em 11/05/2026 08:38 BRT via API MWAA)
+    // DATA (atualizado em 11/05/2026 16:43 BRT via API MWAA)
     // ============================================================
     const dagData = [
         {
             table: "tb_tgt_dmc_ci_ex_aluno",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_ex_aluno",
             runs: [
+                { date: "11/05/2026", status: "success", start: "16:28:41", end: "16:31:49", durationSec: 188 },
                 { date: "09/05/2026", status: "success", start: "11:28:59", end: "11:31:44", durationSec: 165 },
                 { date: "08/05/2026", status: "success", start: "10:28:16", end: "10:31:36", durationSec: 200 },
                 { date: "07/05/2026", status: "success", start: "10:58:35", end: "11:01:30", durationSec: 175 },
@@ -199,6 +200,7 @@
             table: "tb_tgt_dmc_ci_captacao",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_captacao",
             runs: [
+                { date: "11/05/2026", status: "success", start: "15:11:43", end: "16:28:41", durationSec: 4618 },
                 { date: "09/05/2026", status: "success", start: "10:12:16", end: "11:28:59", durationSec: 4603 },
                 { date: "08/05/2026", status: "success", start: "09:12:34", end: "10:28:16", durationSec: 4542 },
                 { date: "07/05/2026", status: "success", start: "09:10:51", end: "10:58:35", durationSec: 6464 },
@@ -226,6 +228,7 @@
             table: "tb_tgt_dmc_ci_aluno_evadido",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_aluno_evadido",
             runs: [
+                { date: "11/05/2026", status: "success", start: "16:31:49", end: "16:35:04", durationSec: 195 },
                 { date: "09/05/2026", status: "success", start: "11:31:45", end: "11:35:03", durationSec: 198 },
                 { date: "08/05/2026", status: "success", start: "10:31:36", end: "10:34:49", durationSec: 193 },
                 { date: "07/05/2026", status: "success", start: "11:01:31", end: "11:04:36", durationSec: 185 },
@@ -238,6 +241,7 @@
             table: "tb_tgt_dmc_ci_aluno",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_aluno",
             runs: [
+                { date: "11/05/2026", status: "success", start: "15:11:43", end: "15:50:44", durationSec: 2341 },
                 { date: "09/05/2026", status: "success", start: "10:12:16", end: "10:50:24", durationSec: 2288 },
                 { date: "08/05/2026", status: "success", start: "09:27:58", end: "09:53:13", durationSec: 1515 },
                 { date: "07/05/2026", status: "success", start: "09:10:51", end: "09:51:56", durationSec: 2465 },
@@ -408,8 +412,8 @@
         }
     });
 
-    // 5. Timeline chart (most recent full day with all DAGs = 09/05/2026)
-    const todayRuns = allRows.filter(r => r.date === "09/05/2026");
+    // 5. Timeline chart (most recent full day with all DAGs = 11/05/2026)
+    const todayRuns = allRows.filter(r => r.date === "11/05/2026");
     const timelineData = todayRuns.map(r => {
         const [sh, sm] = r.start.split(":").map(Number);
         const [eh, em] = r.end.split(":").map(Number);
@@ -432,7 +436,7 @@
                 tooltip: { callbacks: { label: (ctx) => { if (ctx.datasetIndex === 0) return null; const run = todayRuns[ctx.dataIndex]; return `${run.start} → ${run.end} (${formatDuration(run.durationSec)})`; } } }
             },
             scales: {
-                x: { stacked: true, min: 4, max: 12, title: { display: true, text: "Hora (BRT)" }, ticks: { callback: v => `${Math.floor(v)}:00` } },
+                x: { stacked: true, min: 4, max: 17, title: { display: true, text: "Hora (BRT)" }, ticks: { callback: v => `${Math.floor(v)}:00` } },
                 y: { stacked: true }
             }
         }
