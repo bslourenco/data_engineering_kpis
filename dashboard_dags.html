@@ -85,7 +85,7 @@
             <span>📅 Período: 08/05/2026 a 15/05/2026</span>
             <span>🏢 Ambiente: datax-gold-prd</span>
             <span>☁️ AWS Account: 785100678825</span>
-            <span>🕐 Gerado em: 15/05/2026 09:58 BRT</span>
+            <span>🕐 Gerado em: 15/05/2026 12:03 BRT</span>
         </div>
     </div>
 
@@ -93,11 +93,11 @@
         <!-- KPI Cards -->
         <div class="kpi-grid">
             <div class="kpi-card primary">
-                <div class="kpi-value">34</div>
+                <div class="kpi-value">36</div>
                 <div class="kpi-label">Total de Execuções</div>
             </div>
             <div class="kpi-card success">
-                <div class="kpi-value">94.1%</div>
+                <div class="kpi-value">100%</div>
                 <div class="kpi-label">Taxa de Sucesso</div>
             </div>
             <div class="kpi-card danger">
@@ -105,7 +105,7 @@
                 <div class="kpi-label">Falhas no Período</div>
             </div>
             <div class="kpi-card warning">
-                <div class="kpi-value">12min</div>
+                <div class="kpi-value">15min</div>
                 <div class="kpi-label">Duração Média Geral</div>
             </div>
         </div>
@@ -181,13 +181,14 @@
 
     <script>
     // ============================================================
-    // DATA (atualizado em 15/05/2026 09:58 BRT via API MWAA)
+    // DATA (atualizado em 15/05/2026 12:03 BRT via API MWAA)
     // ============================================================
     const dagData = [
         {
             table: "tb_tgt_dmc_ci_ex_aluno",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_ex_aluno",
             runs: [
+                { date: "15/05/2026", status: "success", start: "10:49:02", end: "10:52:14", durationSec: 192 },
                 { date: "14/05/2026", status: "success", start: "10:46:08", end: "10:50:08", durationSec: 240 },
                 { date: "13/05/2026", status: "success", start: "10:55:06", end: "10:58:02", durationSec: 176 },
                 { date: "12/05/2026", status: "success", start: "10:26:09", end: "10:29:08", durationSec: 179 },
@@ -200,7 +201,7 @@
             table: "tb_tgt_dmc_ci_captacao",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_captacao",
             runs: [
-                { date: "15/05/2026", status: "running", start: "09:32:11", end: "—", durationSec: 3566 },
+                { date: "15/05/2026", status: "success", start: "09:32:11", end: "10:49:02", durationSec: 4611 },
                 { date: "14/05/2026", status: "success", start: "09:31:09", end: "10:27:58", durationSec: 3409 },
                 { date: "13/05/2026", status: "success", start: "09:38:13", end: "10:55:06", durationSec: 4613 },
                 { date: "12/05/2026", status: "success", start: "09:10:50", end: "10:26:09", durationSec: 4519 },
@@ -227,6 +228,7 @@
             table: "tb_tgt_dmc_ci_aluno_evadido",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_aluno_evadido",
             runs: [
+                { date: "15/05/2026", status: "success", start: "10:52:14", end: "10:56:19", durationSec: 245 },
                 { date: "14/05/2026", status: "success", start: "10:50:09", end: "10:56:07", durationSec: 358 },
                 { date: "13/05/2026", status: "success", start: "10:58:02", end: "11:01:26", durationSec: 204 },
                 { date: "12/05/2026", status: "success", start: "10:29:08", end: "10:32:21", durationSec: 193 },
@@ -239,7 +241,7 @@
             table: "tb_tgt_dmc_ci_aluno",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_aluno",
             runs: [
-                { date: "15/05/2026", status: "running", start: "09:49:49", end: "—", durationSec: 2700 },
+                { date: "15/05/2026", status: "success", start: "09:49:49", end: "10:22:28", durationSec: 1959 },
                 { date: "14/05/2026", status: "success", start: "10:22:59", end: "10:46:08", durationSec: 1389 },
                 { date: "13/05/2026", status: "success", start: "09:38:13", end: "10:15:40", durationSec: 2247 },
                 { date: "12/05/2026", status: "success", start: "09:10:50", end: "09:49:56", durationSec: 2346 },
@@ -419,11 +421,11 @@
         }
     });
 
-    // 5. Timeline chart (most recent day with data = 15/05/2026)
+    // 5. Timeline chart (most recent day = 15/05/2026)
     const todayRuns = allRows.filter(r => r.date === "15/05/2026");
     const timelineData = todayRuns.map(r => {
         const [sh, sm] = r.start.split(":").map(Number);
-        const endTime = r.end === "—" ? 10.5 : (() => { const [eh, em] = r.end.split(":").map(Number); return eh + em / 60; })();
+        const endTime = r.end === "—" ? sh + sm / 60 + 0.5 : (() => { const [eh, em] = r.end.split(":").map(Number); return eh + em / 60; })();
         return { dag: shortTableName(r.table), start: sh + sm / 60, end: endTime, status: r.status };
     });
 
