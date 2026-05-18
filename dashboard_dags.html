@@ -85,7 +85,7 @@
             <span>📅 Período: 11/05/2026 a 18/05/2026</span>
             <span>🏢 Ambiente: datax-gold-prd</span>
             <span>☁️ AWS Account: 785100678825</span>
-            <span>🕐 Gerado em: 18/05/2026 09:52 BRT</span>
+            <span>🕐 Gerado em: 18/05/2026 13:10 BRT</span>
         </div>
     </div>
 
@@ -181,7 +181,7 @@
 
     <script>
     // ============================================================
-    // DATA (atualizado em 18/05/2026 09:52 BRT via API MWAA)
+    // DATA (atualizado em 18/05/2026 13:10 BRT via API MWAA)
     // ============================================================
     const dagData = [
         {
@@ -417,9 +417,15 @@
         }
     });
 
-    // 5. Timeline chart (most recent day with multiple DAGs = 16/05/2026)
-    const timelineDay = "16/05/2026";
-    const todayRuns = allRows.filter(r => r.date === timelineDay);
+    // 5. Timeline chart (most recent day with multiple DAGs)
+    const timelineDay = "18/05/2026";
+    let todayRuns = allRows.filter(r => r.date === timelineDay);
+    // If only 1 or fewer runs today, use most recent day with multiple runs
+    if (todayRuns.length <= 1) {
+        const fallbackDay = "16/05/2026";
+        todayRuns = allRows.filter(r => r.date === fallbackDay);
+        document.querySelector(".timeline-section h3").textContent = "🕐 Linha do Tempo — Execuções Mais Recentes (16/05/2026)";
+    }
     const timelineData = todayRuns.map(r => {
         const [sh, sm] = r.start.split(":").map(Number);
         const endTime = r.end === "—" ? sh + sm / 60 + 0.5 : (() => { const [eh, em] = r.end.split(":").map(Number); return eh + em / 60; })();
