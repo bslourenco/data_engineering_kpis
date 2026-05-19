@@ -79,13 +79,13 @@
 </head>
 <body>
     <div class="header">
-        <h1>📊 Dashboard Executivo — Pipelines DMC Campanhas</h1>
+        <h1>&#x1F4CA; Dashboard Executivo — Pipelines DMC Campanhas</h1>
         <p class="subtitle">Monitoramento de execução das DAGs de carga de dados</p>
         <div class="header-meta">
-            <span>📅 Período: 11/05/2026 a 18/05/2026</span>
-            <span>🏢 Ambiente: datax-gold-prd</span>
-            <span>☁️ AWS Account: 785100678825</span>
-            <span>🕐 Gerado em: 18/05/2026 15:26 BRT</span>
+            <span>&#x1F4C5; Período: 12/05/2026 a 19/05/2026</span>
+            <span>&#x1F3E2; Ambiente: datax-gold-prd</span>
+            <span>&#x2601;&#xFE0F; AWS Account: 785100678825</span>
+            <span>&#x1F550; Gerado em: 19/05/2026 14:14 BRT</span>
         </div>
     </div>
 
@@ -97,7 +97,7 @@
                 <div class="kpi-label">Total de Execuções</div>
             </div>
             <div class="kpi-card success">
-                <div class="kpi-value">94%</div>
+                <div class="kpi-value">97%</div>
                 <div class="kpi-label">Taxa de Sucesso</div>
             </div>
             <div class="kpi-card danger">
@@ -105,7 +105,7 @@
                 <div class="kpi-label">Falhas no Período</div>
             </div>
             <div class="kpi-card warning">
-                <div class="kpi-value">21min</div>
+                <div class="kpi-value">23min</div>
                 <div class="kpi-label">Duração Média Geral</div>
             </div>
         </div>
@@ -113,25 +113,25 @@
         <!-- Charts -->
         <div class="charts-grid">
             <div class="chart-card">
-                <h3>📈 Execuções por Dia</h3>
+                <h3>&#x1F4C8; Execuções por Dia</h3>
                 <div class="chart-container">
                     <canvas id="chartDaily"></canvas>
                 </div>
             </div>
             <div class="chart-card">
-                <h3>⏱️ Duração Média por DAG</h3>
+                <h3>&#x23F1;&#xFE0F; Duração Média por DAG</h3>
                 <div class="chart-container">
                     <canvas id="chartDuration"></canvas>
                 </div>
             </div>
             <div class="chart-card">
-                <h3>🎯 Taxa de Sucesso por DAG</h3>
+                <h3>&#x1F3AF; Taxa de Sucesso por DAG</h3>
                 <div class="chart-container">
                     <canvas id="chartSuccessRate"></canvas>
                 </div>
             </div>
             <div class="chart-card">
-                <h3>📊 Distribuição de Status</h3>
+                <h3>&#x1F4CA; Distribuição de Status</h3>
                 <div class="chart-container">
                     <canvas id="chartStatus"></canvas>
                 </div>
@@ -141,24 +141,24 @@
         <!-- Detailed Table -->
         <div class="table-section">
             <div class="table-header">
-                <h3>📋 Detalhamento de Execuções</h3>
+                <h3>&#x1F4CB; Detalhamento de Execuções</h3>
                 <div class="filter-group">
                     <button class="filter-btn active" data-filter="all">Todas</button>
-                    <button class="filter-btn" data-filter="success">✅ Sucesso</button>
-                    <button class="filter-btn" data-filter="failed">❌ Falhas</button>
-                    <button class="filter-btn" data-filter="running">🔄 Em Execução</button>
+                    <button class="filter-btn" data-filter="success">&#x2705; Sucesso</button>
+                    <button class="filter-btn" data-filter="failed">&#x274C; Falhas</button>
+                    <button class="filter-btn" data-filter="running">&#x1F504; Em Execução</button>
                 </div>
             </div>
             <div style="overflow-x: auto;">
                 <table id="execTable">
                     <thead>
                         <tr>
-                            <th onclick="sortTable(0)">Tabela / DAG <span class="sort-icon">⇅</span></th>
-                            <th onclick="sortTable(1)">Data <span class="sort-icon">⇅</span></th>
-                            <th onclick="sortTable(2)">Status <span class="sort-icon">⇅</span></th>
-                            <th onclick="sortTable(3)">Início (BRT) <span class="sort-icon">⇅</span></th>
-                            <th onclick="sortTable(4)">Fim (BRT) <span class="sort-icon">⇅</span></th>
-                            <th onclick="sortTable(5)">Duração <span class="sort-icon">⇅</span></th>
+                            <th onclick="sortTable(0)">Tabela / DAG <span class="sort-icon">&#x21C5;</span></th>
+                            <th onclick="sortTable(1)">Data <span class="sort-icon">&#x21C5;</span></th>
+                            <th onclick="sortTable(2)">Status <span class="sort-icon">&#x21C5;</span></th>
+                            <th onclick="sortTable(3)">Início (BRT) <span class="sort-icon">&#x21C5;</span></th>
+                            <th onclick="sortTable(4)">Fim (BRT) <span class="sort-icon">&#x21C5;</span></th>
+                            <th onclick="sortTable(5)">Duração <span class="sort-icon">&#x21C5;</span></th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -168,7 +168,7 @@
 
         <!-- Timeline -->
         <div class="timeline-section">
-            <h3>🕐 Linha do Tempo — Execuções Mais Recentes (18/05/2026)</h3>
+            <h3>&#x1F550; Linha do Tempo — Execuções Mais Recentes (19/05/2026)</h3>
             <div class="chart-container" style="height: 200px;">
                 <canvas id="chartTimeline"></canvas>
             </div>
@@ -181,71 +181,71 @@
 
     <script>
     // ============================================================
-    // DATA (atualizado em 18/05/2026 15:26 BRT via API MWAA)
+    // DATA (atualizado em 19/05/2026 14:14 BRT via API MWAA)
     // ============================================================
     const dagData = [
         {
             table: "tb_tgt_dmc_ci_ex_aluno",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_ex_aluno",
             runs: [
+                { date: "18/05/2026", status: "success", start: "16:21:38", end: "16:25:04", durationSec: 206 },
                 { date: "16/05/2026", status: "success", start: "19:27:15", end: "19:30:11", durationSec: 175 },
                 { date: "15/05/2026", status: "success", start: "10:49:02", end: "10:52:14", durationSec: 192 },
                 { date: "14/05/2026", status: "success", start: "10:46:08", end: "10:50:08", durationSec: 240 },
                 { date: "13/05/2026", status: "success", start: "10:55:06", end: "10:58:02", durationSec: 175 },
-                { date: "12/05/2026", status: "success", start: "10:26:09", end: "10:29:08", durationSec: 179 },
-                { date: "11/05/2026", status: "success", start: "16:28:41", end: "16:31:49", durationSec: 187 }
+                { date: "12/05/2026", status: "success", start: "10:26:09", end: "10:29:08", durationSec: 179 }
             ]
         },
         {
             table: "tb_tgt_dmc_ci_captacao",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_captacao",
             runs: [
-                { date: "18/05/2026", status: "running", start: "14:43:57", end: "—", durationSec: 0 },
+                { date: "19/05/2026", status: "running", start: "10:35:11", end: "---", durationSec: 0 },
+                { date: "18/05/2026", status: "success", start: "14:43:57", end: "16:21:37", durationSec: 5860 },
                 { date: "16/05/2026", status: "success", start: "18:11:48", end: "19:27:15", durationSec: 4526 },
                 { date: "15/05/2026", status: "success", start: "09:32:11", end: "10:49:02", durationSec: 4611 },
                 { date: "14/05/2026", status: "success", start: "09:31:09", end: "10:27:58", durationSec: 3409 },
                 { date: "13/05/2026", status: "success", start: "09:38:13", end: "10:55:06", durationSec: 4612 },
-                { date: "12/05/2026", status: "success", start: "09:10:50", end: "10:26:09", durationSec: 4519 },
-                { date: "11/05/2026", status: "success", start: "15:11:43", end: "16:28:41", durationSec: 4617 }
+                { date: "12/05/2026", status: "success", start: "09:10:50", end: "10:26:09", durationSec: 4519 }
             ]
         },
         {
             table: "tb_tgt_dmc_ci_reguas_diario",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_reguas_diario",
             runs: [
+                { date: "19/05/2026", status: "success", start: "04:53:55", end: "04:55:19", durationSec: 83 },
                 { date: "18/05/2026", status: "success", start: "05:03:53", end: "05:05:20", durationSec: 87 },
                 { date: "17/05/2026", status: "success", start: "04:13:59", end: "04:15:24", durationSec: 84 },
                 { date: "16/05/2026", status: "success", start: "04:13:45", end: "04:15:14", durationSec: 89 },
                 { date: "15/05/2026", status: "success", start: "04:17:28", end: "04:18:53", durationSec: 85 },
                 { date: "14/05/2026", status: "success", start: "04:36:06", end: "04:37:30", durationSec: 84 },
                 { date: "13/05/2026", status: "success", start: "04:34:11", end: "04:35:38", durationSec: 86 },
-                { date: "12/05/2026", status: "success", start: "03:59:35", end: "04:01:05", durationSec: 89 },
-                { date: "11/05/2026", status: "success", start: "04:03:17", end: "04:04:37", durationSec: 79 }
+                { date: "12/05/2026", status: "success", start: "03:59:35", end: "04:01:05", durationSec: 89 }
             ]
         },
         {
             table: "tb_tgt_dmc_ci_aluno_evadido",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_aluno_evadido",
             runs: [
+                { date: "18/05/2026", status: "success", start: "16:25:04", end: "16:29:47", durationSec: 282 },
                 { date: "16/05/2026", status: "success", start: "19:30:11", end: "19:33:24", durationSec: 193 },
                 { date: "15/05/2026", status: "success", start: "10:52:14", end: "10:56:19", durationSec: 245 },
                 { date: "14/05/2026", status: "success", start: "10:50:09", end: "10:56:07", durationSec: 358 },
                 { date: "13/05/2026", status: "success", start: "10:58:02", end: "11:01:26", durationSec: 204 },
-                { date: "12/05/2026", status: "success", start: "10:29:08", end: "10:32:21", durationSec: 192 },
-                { date: "11/05/2026", status: "success", start: "16:31:49", end: "16:35:04", durationSec: 195 }
+                { date: "12/05/2026", status: "success", start: "10:29:08", end: "10:32:21", durationSec: 192 }
             ]
         },
         {
             table: "tb_tgt_dmc_ci_aluno",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_aluno",
             runs: [
-                { date: "18/05/2026", status: "running", start: "14:43:57", end: "—", durationSec: 0 },
+                { date: "19/05/2026", status: "success", start: "10:35:11", end: "11:14:36", durationSec: 2364 },
+                { date: "18/05/2026", status: "success", start: "14:43:57", end: "15:29:45", durationSec: 2747 },
                 { date: "16/05/2026", status: "success", start: "18:11:48", end: "18:52:07", durationSec: 2418 },
                 { date: "15/05/2026", status: "success", start: "09:49:49", end: "10:22:28", durationSec: 1958 },
                 { date: "14/05/2026", status: "success", start: "10:22:59", end: "10:46:08", durationSec: 1388 },
                 { date: "13/05/2026", status: "success", start: "09:38:13", end: "10:15:40", durationSec: 2247 },
-                { date: "12/05/2026", status: "success", start: "09:10:50", end: "09:49:56", durationSec: 2346 },
-                { date: "11/05/2026", status: "success", start: "15:11:43", end: "15:50:44", durationSec: 2340 }
+                { date: "12/05/2026", status: "success", start: "09:10:50", end: "09:49:56", durationSec: 2346 }
             ]
         }
     ];
@@ -282,9 +282,9 @@
 
         tbody.innerHTML = filtered.map(row => {
             let statusBadge;
-            if (row.status === "success") statusBadge = '<span class="status-badge success">✅ Sucesso</span>';
-            else if (row.status === "failed") statusBadge = '<span class="status-badge failed">❌ Falha</span>';
-            else statusBadge = '<span class="status-badge running">🔄 Em Execução</span>';
+            if (row.status === "success") statusBadge = '<span class="status-badge success">&#x2705; Sucesso</span>';
+            else if (row.status === "failed") statusBadge = '<span class="status-badge failed">&#x274C; Falha</span>';
+            else statusBadge = '<span class="status-badge running">&#x1F504; Em Execução</span>';
 
             return `
             <tr>
@@ -336,7 +336,7 @@
     };
 
     // 1. Daily executions chart
-    const dates = ["11/05", "12/05", "13/05", "14/05", "15/05", "16/05", "17/05", "18/05"];
+    const dates = ["12/05", "13/05", "14/05", "15/05", "16/05", "17/05", "18/05", "19/05"];
     const dailySuccess = dates.map(d => allRows.filter(r => r.date.startsWith(d) && r.status === "success").length);
     const dailyFailed = dates.map(d => allRows.filter(r => r.date.startsWith(d) && r.status === "failed").length);
     const dailyRunning = dates.map(d => allRows.filter(r => r.date.startsWith(d) && r.status === "running").length);
@@ -420,29 +420,26 @@
     });
 
     // 5. Timeline chart (most recent day with multiple DAGs)
-    const timelineDay = "18/05/2026";
+    const timelineDay = "19/05/2026";
     let todayRuns = allRows.filter(r => r.date === timelineDay);
-    // If only 1 or fewer runs today, use most recent day with multiple runs
     if (todayRuns.length <= 1) {
-        // Find most recent day with multiple runs
         const dateCounts = {};
         allRows.forEach(r => { dateCounts[r.date] = (dateCounts[r.date] || 0) + 1; });
         const multiDays = Object.entries(dateCounts).filter(([d, c]) => c > 1).map(([d]) => d);
         if (multiDays.length > 0) {
-            // Sort by date descending
             multiDays.sort((a, b) => {
-                const [da, ma] = a.split("/").map(Number);
-                const [db, mb] = b.split("/").map(Number);
-                return mb - ma || db - da;
+                const [da, ma, ya] = a.split("/").map(Number);
+                const [db, mb, yb] = b.split("/").map(Number);
+                return yb - ya || mb - ma || db - da;
             });
             const fallbackDay = multiDays[0];
             todayRuns = allRows.filter(r => r.date === fallbackDay);
-            document.querySelector(".timeline-section h3").textContent = "🕐 Linha do Tempo — Execuções Mais Recentes (" + fallbackDay + ")";
+            document.querySelector(".timeline-section h3").textContent = "\u{1F550} Linha do Tempo — Execuções Mais Recentes (" + fallbackDay + ")";
         }
     }
     const timelineData = todayRuns.map(r => {
         const [sh, sm] = r.start.split(":").map(Number);
-        const endTime = r.end === "—" ? sh + sm / 60 + 0.5 : (() => { const [eh, em] = r.end.split(":").map(Number); return eh + em / 60; })();
+        const endTime = r.end === "---" ? sh + sm / 60 + 0.5 : (() => { const [eh, em] = r.end.split(":").map(Number); return eh + em / 60; })();
         return { dag: shortTableName(r.table), start: sh + sm / 60, end: endTime, status: r.status };
     });
 
@@ -460,7 +457,7 @@
                 responsive: true, maintainAspectRatio: false, indexAxis: "y",
                 plugins: {
                     legend: { display: false },
-                    tooltip: { callbacks: { label: (ctx) => { if (ctx.datasetIndex === 0) return null; const run = todayRuns[ctx.dataIndex]; return `${run.start} → ${run.end} (${formatDuration(run.durationSec)})`; } } }
+                    tooltip: { callbacks: { label: (ctx) => { if (ctx.datasetIndex === 0) return null; const run = todayRuns[ctx.dataIndex]; return `${run.start} -> ${run.end} (${formatDuration(run.durationSec)})`; } } }
                 },
                 scales: {
                     x: { stacked: true, title: { display: true, text: "Hora (BRT)" }, ticks: { callback: v => `${Math.floor(v)}:00` } },
