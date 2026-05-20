@@ -4,92 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Execuções MWAA — Plataforma de Dados</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --bg-primary: #0f1117;
-            --bg-secondary: #1a1d27;
-            --bg-card: #1e2130;
-            --border: #2a2d3e;
-            --text-primary: #e8eaed;
-            --text-secondary: #9aa0a6;
-            --accent-blue: #4fc3f7;
-            --accent-green: #66bb6a;
-            --accent-red: #ef5350;
-            --accent-orange: #ffa726;
-            --accent-purple: #ab47bc;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0f1419;
+            color: #e7e9ea;
             min-height: 100vh;
+            padding: 2rem;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem;
         }
 
         header {
             text-align: center;
             margin-bottom: 2.5rem;
             padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid #2f3336;
         }
 
         header h1 {
             font-size: 1.8rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
         }
 
         header p {
-            color: var(--text-secondary);
+            color: #71767b;
             font-size: 0.95rem;
         }
 
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.2rem;
+            gap: 1.25rem;
             margin-bottom: 2.5rem;
         }
 
         .kpi-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: #1a1f25;
+            border: 1px solid #2f3336;
             border-radius: 12px;
             padding: 1.5rem;
             text-align: center;
-            transition: transform 0.2s;
+            transition: transform 0.2s, border-color 0.2s;
         }
 
-        .kpi-card:hover { transform: translateY(-2px); }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            border-color: #4a9eff;
+        }
 
-        .kpi-card .kpi-value {
-            font-size: 2.4rem;
+        .kpi-card .value {
+            font-size: 2.2rem;
             font-weight: 700;
             margin-bottom: 0.3rem;
         }
 
-        .kpi-card .kpi-label {
+        .kpi-card .label {
             font-size: 0.85rem;
-            color: var(--text-secondary);
+            color: #71767b;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .kpi-card.total .kpi-value { color: var(--accent-blue); }
-        .kpi-card.success .kpi-value { color: var(--accent-green); }
-        .kpi-card.failed .kpi-value { color: var(--accent-red); }
-        .kpi-card.rate .kpi-value { color: var(--accent-purple); }
+        .kpi-card.total .value { color: #4a9eff; }
+        .kpi-card.success .value { color: #00c853; }
+        .kpi-card.failed .value { color: #ff5252; }
+        .kpi-card.rate .value { color: #ffab40; }
 
         .charts-grid {
             display: grid;
@@ -99,26 +91,32 @@
         }
 
         .chart-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: #1a1f25;
+            border: 1px solid #2f3336;
             border-radius: 12px;
             padding: 1.5rem;
         }
 
         .chart-card h3 {
             font-size: 1rem;
-            font-weight: 500;
-            color: var(--text-secondary);
+            font-weight: 600;
             margin-bottom: 1rem;
+            color: #e7e9ea;
         }
 
-        .chart-full {
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+        }
+
+        .full-width {
             grid-column: 1 / -1;
         }
 
         .table-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: #1a1f25;
+            border: 1px solid #2f3336;
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 2.5rem;
@@ -127,9 +125,9 @@
 
         .table-section h3 {
             font-size: 1rem;
-            font-weight: 500;
-            color: var(--text-secondary);
+            font-weight: 600;
             margin-bottom: 1rem;
+            color: #e7e9ea;
         }
 
         table {
@@ -140,19 +138,21 @@
 
         th, td {
             padding: 0.75rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
+            text-align: left;
+            border-bottom: 1px solid #2f3336;
         }
 
         th {
-            color: var(--text-secondary);
-            font-weight: 500;
+            color: #71767b;
+            font-weight: 600;
             text-transform: uppercase;
             font-size: 0.75rem;
             letter-spacing: 0.5px;
         }
 
-        td { color: var(--text-primary); }
+        tr:hover td {
+            background: #1e2730;
+        }
 
         .badge {
             display: inline-block;
@@ -162,13 +162,24 @@
             font-weight: 600;
         }
 
-        .badge-healthy { background: rgba(102, 187, 106, 0.15); color: var(--accent-green); }
-        .badge-warning { background: rgba(255, 167, 38, 0.15); color: var(--accent-orange); }
-        .badge-critical { background: rgba(239, 83, 80, 0.15); color: var(--accent-red); }
+        .badge-healthy {
+            background: rgba(0, 200, 83, 0.15);
+            color: #00c853;
+        }
+
+        .badge-warning {
+            background: rgba(255, 171, 64, 0.15);
+            color: #ffab40;
+        }
+
+        .badge-critical {
+            background: rgba(255, 82, 82, 0.15);
+            color: #ff5252;
+        }
 
         .failures-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: #1a1f25;
+            border: 1px solid #2f3336;
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 2.5rem;
@@ -176,9 +187,9 @@
 
         .failures-section h3 {
             font-size: 1rem;
-            font-weight: 500;
-            color: var(--accent-red);
+            font-weight: 600;
             margin-bottom: 1rem;
+            color: #ff5252;
         }
 
         .failure-item {
@@ -186,51 +197,76 @@
             justify-content: space-between;
             align-items: center;
             padding: 0.75rem 1rem;
-            background: rgba(239, 83, 80, 0.05);
-            border: 1px solid rgba(239, 83, 80, 0.2);
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #2f3336;
+        }
+
+        .failure-item:last-child {
+            border-bottom: none;
         }
 
         .failure-item .dag-name {
-            font-family: 'Courier New', monospace;
+            font-family: 'SF Mono', 'Fira Code', monospace;
             font-size: 0.85rem;
-            color: var(--text-primary);
+            color: #e7e9ea;
+            word-break: break-all;
         }
 
-        .failure-item .failure-count {
-            background: var(--accent-red);
-            color: white;
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
+        .failure-item .failure-stats {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+
+        .failure-item .failure-stats span {
+            font-size: 0.8rem;
+            color: #71767b;
+        }
+
+        .failure-item .failure-stats .count {
+            color: #ff5252;
+            font-weight: 700;
         }
 
         footer {
             text-align: center;
             padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
-            color: var(--text-secondary);
+            border-top: 1px solid #2f3336;
+            color: #71767b;
             font-size: 0.8rem;
         }
 
-        footer .timestamp {
+        footer p {
             margin-bottom: 0.3rem;
         }
 
         @media print {
-            body { background: white; color: #333; }
-            .kpi-card, .chart-card, .table-section, .failures-section {
-                border: 1px solid #ddd;
-                background: white;
+            body {
+                background: #ffffff;
+                color: #1a1a1a;
+                padding: 1rem;
             }
-            .kpi-card .kpi-value { color: #333 !important; }
+            .kpi-card, .chart-card, .table-section, .failures-section {
+                background: #ffffff;
+                border-color: #e0e0e0;
+            }
+            .kpi-card .label, th, footer { color: #666; }
+            .kpi-card.total .value { color: #1976d2; }
+            .kpi-card.success .value { color: #2e7d32; }
+            .kpi-card.failed .value { color: #c62828; }
+            .kpi-card.rate .value { color: #e65100; }
+            header { border-bottom-color: #e0e0e0; }
+            footer { border-top-color: #e0e0e0; }
         }
 
         @media (max-width: 768px) {
-            .charts-grid { grid-template-columns: 1fr; }
-            .container { padding: 1rem; }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
@@ -238,26 +274,26 @@
     <div class="container">
         <header>
             <h1>📊 Dashboard de Execuções MWAA</h1>
-            <p>Ambiente: datax-gold-prd | Últimos 7 dias | Atualizado em 20/05/2026 13:36 UTC</p>
+            <p>Ambiente: datax-gold-prd | Período: 13/05/2026 — 20/05/2026</p>
         </header>
 
         <!-- KPIs -->
         <div class="kpi-grid">
             <div class="kpi-card total">
-                <div class="kpi-value">493</div>
-                <div class="kpi-label">Total de Execuções</div>
+                <div class="value">490</div>
+                <div class="label">Total de Execuções</div>
             </div>
             <div class="kpi-card success">
-                <div class="kpi-value">489</div>
-                <div class="kpi-label">Sucesso</div>
+                <div class="value">486</div>
+                <div class="label">Sucesso</div>
             </div>
             <div class="kpi-card failed">
-                <div class="kpi-value">2</div>
-                <div class="kpi-label">Falhas</div>
+                <div class="value">3</div>
+                <div class="label">Falhas</div>
             </div>
             <div class="kpi-card rate">
-                <div class="kpi-value">99.19%</div>
-                <div class="kpi-label">Taxa de Sucesso</div>
+                <div class="value">99.18%</div>
+                <div class="label">Taxa de Sucesso</div>
             </div>
         </div>
 
@@ -265,15 +301,21 @@
         <div class="charts-grid">
             <div class="chart-card">
                 <h3>Execuções por Dia (Sucesso vs Falha)</h3>
-                <canvas id="barChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
             </div>
             <div class="chart-card">
                 <h3>Distribuição Geral</h3>
-                <canvas id="doughnutChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
             </div>
-            <div class="chart-card chart-full">
+            <div class="chart-card full-width">
                 <h3>Evolução da Taxa de Sucesso (%)</h3>
-                <canvas id="lineChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="lineChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -284,10 +326,10 @@
                 <thead>
                     <tr>
                         <th>Data</th>
-                        <th>Total</th>
                         <th>Sucesso</th>
                         <th>Falhas</th>
                         <th>Running</th>
+                        <th>Total</th>
                         <th>Taxa de Sucesso</th>
                         <th>Status</th>
                     </tr>
@@ -299,69 +341,86 @@
 
         <!-- Recurring Failures -->
         <div class="failures-section">
-            <h3>⚠️ DAGs com Falhas Recorrentes (2+ falhas em 7 dias)</h3>
+            <h3>⚠️ DAGs com Falhas Recorrentes (≥2 falhas em 7 dias)</h3>
             <div id="failuresList">
             </div>
         </div>
 
         <footer>
-            <div class="timestamp">Gerado em: 20/05/2026 às 13:36 UTC</div>
-            <div>Plataforma de Dados — Cogna Educação</div>
+            <p>Gerado em: 20/05/2026 às 18:12 UTC</p>
+            <p><strong>Plataforma de Dados — Cogna Educação</strong></p>
         </footer>
     </div>
 
     <script>
-        // Data
-        const dailySummary = [
-            { date: "2026-05-13", total: 7, success: 7, failed: 0, running: 0, queued: 0, success_rate: 100.0 },
-            { date: "2026-05-14", total: 74, success: 74, failed: 0, running: 0, queued: 0, success_rate: 100.0 },
-            { date: "2026-05-15", total: 76, success: 76, failed: 0, running: 0, queued: 0, success_rate: 100.0 },
-            { date: "2026-05-16", total: 73, success: 73, failed: 0, running: 0, queued: 0, success_rate: 100.0 },
-            { date: "2026-05-17", total: 68, success: 67, failed: 1, running: 0, queued: 0, success_rate: 98.53 },
-            { date: "2026-05-18", total: 78, success: 76, failed: 1, running: 1, queued: 0, success_rate: 97.44 },
-            { date: "2026-05-19", total: 73, success: 72, failed: 0, running: 1, queued: 0, success_rate: 98.63 },
-            { date: "2026-05-20", total: 44, success: 44, failed: 0, running: 0, queued: 0, success_rate: 100.0 }
-        ];
+        // Data from MWAA API
+        const dailyData = {
+            "2026-05-14": { "success": 74, "failed": 0, "running": 0 },
+            "2026-05-15": { "success": 76, "failed": 0, "running": 0 },
+            "2026-05-16": { "success": 73, "failed": 0, "running": 0 },
+            "2026-05-17": { "success": 67, "failed": 1, "running": 0 },
+            "2026-05-18": { "success": 76, "failed": 1, "running": 1 },
+            "2026-05-19": { "success": 75, "failed": 0, "running": 0 },
+            "2026-05-20": { "success": 45, "failed": 1, "running": 0 }
+        };
 
-        const recurringFailures = [
-            { dag_id: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_dim_dm_campanhas", failure_count: 2 }
-        ];
+        const recurringFailures = {
+            "business_dmc_campanhas_4045_dm_campanhas_wf_crg_dim_dm_campanhas": {
+                "failures": 2,
+                "total_runs": 7,
+                "failure_rate": 28.6
+            }
+        };
 
-        const statesDistribution = { success: 489, running: 2, failed: 2 };
-
-        // Format date for display
-        function formatDate(dateStr) {
-            const parts = dateStr.split('-');
+        const days = Object.keys(dailyData).sort();
+        const successData = days.map(d => dailyData[d].success || 0);
+        const failedData = days.map(d => dailyData[d].failed || 0);
+        const runningData = days.map(d => dailyData[d].running || 0);
+        const labels = days.map(d => {
+            const parts = d.split('-');
             return `${parts[2]}/${parts[1]}`;
-        }
+        });
 
         // Bar Chart - Stacked
         const barCtx = document.getElementById('barChart').getContext('2d');
         new Chart(barCtx, {
             type: 'bar',
             data: {
-                labels: dailySummary.map(d => formatDate(d.date)),
+                labels: labels,
                 datasets: [
                     {
                         label: 'Sucesso',
-                        data: dailySummary.map(d => d.success),
-                        backgroundColor: 'rgba(102, 187, 106, 0.8)',
+                        data: successData,
+                        backgroundColor: 'rgba(0, 200, 83, 0.8)',
                         borderRadius: 4
                     },
                     {
                         label: 'Falha',
-                        data: dailySummary.map(d => d.failed),
-                        backgroundColor: 'rgba(239, 83, 80, 0.8)',
+                        data: failedData,
+                        backgroundColor: 'rgba(255, 82, 82, 0.8)',
                         borderRadius: 4
                     }
                 ]
             },
             options: {
                 responsive: true,
-                plugins: { legend: { labels: { color: '#9aa0a6' } } },
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#71767b' }
+                    }
+                },
                 scales: {
-                    x: { stacked: true, ticks: { color: '#9aa0a6' }, grid: { color: 'rgba(42, 45, 62, 0.5)' } },
-                    y: { stacked: true, ticks: { color: '#9aa0a6' }, grid: { color: 'rgba(42, 45, 62, 0.5)' } }
+                    x: {
+                        stacked: true,
+                        ticks: { color: '#71767b' },
+                        grid: { color: '#2f3336' }
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: { color: '#71767b' },
+                        grid: { color: '#2f3336' }
+                    }
                 }
             }
         });
@@ -373,59 +432,91 @@
             data: {
                 labels: ['Sucesso', 'Falha', 'Running'],
                 datasets: [{
-                    data: [statesDistribution.success, statesDistribution.failed, statesDistribution.running],
+                    data: [486, 3, 1],
                     backgroundColor: [
-                        'rgba(102, 187, 106, 0.8)',
-                        'rgba(239, 83, 80, 0.8)',
-                        'rgba(79, 195, 247, 0.8)'
+                        'rgba(0, 200, 83, 0.8)',
+                        'rgba(255, 82, 82, 0.8)',
+                        'rgba(74, 158, 255, 0.8)'
                     ],
-                    borderWidth: 0
+                    borderColor: '#1a1f25',
+                    borderWidth: 3
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom', labels: { color: '#9aa0a6', padding: 15 } }
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#71767b', padding: 15 }
+                    }
                 },
                 cutout: '65%'
             }
         });
 
         // Line Chart - Success Rate
+        const successRates = days.map(d => {
+            const total = (dailyData[d].success || 0) + (dailyData[d].failed || 0) + (dailyData[d].running || 0);
+            return total > 0 ? parseFloat(((dailyData[d].success || 0) / total * 100).toFixed(2)) : 100;
+        });
+
         const lineCtx = document.getElementById('lineChart').getContext('2d');
         new Chart(lineCtx, {
             type: 'line',
             data: {
-                labels: dailySummary.map(d => formatDate(d.date)),
+                labels: labels,
                 datasets: [{
                     label: 'Taxa de Sucesso (%)',
-                    data: dailySummary.map(d => d.success_rate),
-                    borderColor: 'rgba(171, 71, 188, 0.9)',
-                    backgroundColor: 'rgba(171, 71, 188, 0.1)',
+                    data: successRates,
+                    borderColor: '#ffab40',
+                    backgroundColor: 'rgba(255, 171, 64, 0.1)',
                     fill: true,
                     tension: 0.3,
-                    pointBackgroundColor: 'rgba(171, 71, 188, 1)',
-                    pointRadius: 5
+                    pointBackgroundColor: '#ffab40',
+                    pointBorderColor: '#ffab40',
+                    pointRadius: 5,
+                    pointHoverRadius: 7
                 }]
             },
             options: {
                 responsive: true,
-                plugins: { legend: { labels: { color: '#9aa0a6' } } },
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#71767b' }
+                    }
+                },
                 scales: {
-                    x: { ticks: { color: '#9aa0a6' }, grid: { color: 'rgba(42, 45, 62, 0.5)' } },
-                    y: { min: 90, max: 101, ticks: { color: '#9aa0a6', callback: v => v + '%' }, grid: { color: 'rgba(42, 45, 62, 0.5)' } }
+                    x: {
+                        ticks: { color: '#71767b' },
+                        grid: { color: '#2f3336' }
+                    },
+                    y: {
+                        min: 85,
+                        max: 100,
+                        ticks: { color: '#71767b', callback: v => v + '%' },
+                        grid: { color: '#2f3336' }
+                    }
                 }
             }
         });
 
         // Populate Daily Table
         const tableBody = document.getElementById('dailyTable');
-        dailySummary.forEach(day => {
+        days.forEach(day => {
+            const d = dailyData[day];
+            const success = d.success || 0;
+            const failed = d.failed || 0;
+            const running = d.running || 0;
+            const total = success + failed + running;
+            const rate = total > 0 ? (success / total * 100).toFixed(1) : '100.0';
+
             let badgeClass, badgeText;
-            if (day.success_rate >= 97) {
+            if (rate >= 97) {
                 badgeClass = 'badge-healthy';
                 badgeText = 'Saudável';
-            } else if (day.success_rate >= 90) {
+            } else if (rate >= 90) {
                 badgeClass = 'badge-warning';
                 badgeText = 'Atenção';
             } else {
@@ -433,14 +524,17 @@
                 badgeText = 'Crítico';
             }
 
+            const parts = day.split('-');
+            const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+
             tableBody.innerHTML += `
                 <tr>
-                    <td>${formatDate(day.date)}</td>
-                    <td>${day.total}</td>
-                    <td>${day.success}</td>
-                    <td>${day.failed}</td>
-                    <td>${day.running}</td>
-                    <td>${day.success_rate}%</td>
+                    <td>${formattedDate}</td>
+                    <td>${success}</td>
+                    <td>${failed}</td>
+                    <td>${running}</td>
+                    <td>${total}</td>
+                    <td>${rate}%</td>
                     <td><span class="badge ${badgeClass}">${badgeText}</span></td>
                 </tr>
             `;
@@ -448,14 +542,20 @@
 
         // Populate Failures List
         const failuresList = document.getElementById('failuresList');
-        if (recurringFailures.length === 0) {
-            failuresList.innerHTML = '<p style="color: var(--accent-green); padding: 1rem;">✅ Nenhuma DAG com falhas recorrentes no período.</p>';
+        const failureEntries = Object.entries(recurringFailures);
+
+        if (failureEntries.length === 0) {
+            failuresList.innerHTML = '<p style="color: #00c853; padding: 1rem;">✅ Nenhuma DAG com falhas recorrentes no período.</p>';
         } else {
-            recurringFailures.forEach(f => {
+            failureEntries.forEach(([dagId, stats]) => {
                 failuresList.innerHTML += `
                     <div class="failure-item">
-                        <span class="dag-name">${f.dag_id}</span>
-                        <span class="failure-count">${f.failure_count} falhas</span>
+                        <span class="dag-name">${dagId}</span>
+                        <div class="failure-stats">
+                            <span><span class="count">${stats.failures}</span> falhas</span>
+                            <span>${stats.total_runs} execuções</span>
+                            <span class="badge badge-critical">${stats.failure_rate}%</span>
+                        </div>
                     </div>
                 `;
             });
