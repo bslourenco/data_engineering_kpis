@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Qualidade Captação - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -19,26 +16,13 @@
             padding: 24px;
         }
         
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        
-        .header h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #f8fafc;
-            margin-bottom: 8px;
-        }
-        
-        .header .subtitle {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
+        .header { text-align: center; margin-bottom: 32px; }
+        .header h1 { font-size: 1.8rem; font-weight: 700; color: #f8fafc; margin-bottom: 8px; }
+        .header .subtitle { color: #94a3b8; font-size: 0.9rem; }
         
         .summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px;
             margin-bottom: 32px;
         }
@@ -51,216 +35,286 @@
             border: 1px solid #334155;
         }
         
-        .summary-card .value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-        
-        .summary-card .label {
-            color: #94a3b8;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .summary-card .value { font-size: 2.2rem; font-weight: 700; margin-bottom: 4px; }
+        .summary-card .label { color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .value-total { color: #60a5fa; }
         .value-pass { color: #34d399; }
         .value-fail { color: #f87171; }
         .value-score { color: #fbbf24; }
         
-        .filters {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
+        /* Tabs */
+        .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid #334155; padding-bottom: 0; }
+        .tab {
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            border: 1px solid transparent;
+            border-bottom: none;
+            background: transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
         }
+        .tab:hover { color: #e2e8f0; background: #1e293b; }
+        .tab.active { background: #1e293b; color: #60a5fa; border-color: #334155; }
         
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Filters */
+        .filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
         .filter-btn {
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 8px;
             border: 1px solid #334155;
             background: #1e293b;
             color: #94a3b8;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: all 0.2s;
         }
+        .filter-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+        .filter-btn.active { background: #1e40af; border-color: #3b82f6; color: #fff; }
         
-        .filter-btn:hover {
-            border-color: #60a5fa;
-            color: #60a5fa;
-        }
-        
-        .filter-btn.active {
-            background: #1e40af;
-            border-color: #3b82f6;
-            color: #fff;
-        }
-        
-        .checks-grid {
-            display: grid;
-            gap: 16px;
-        }
-        
+        /* Check cards */
+        .checks-grid { display: grid; gap: 12px; }
         .check-card {
             background: #1e293b;
             border-radius: 12px;
-            padding: 20px;
+            padding: 16px 20px;
             border-left: 4px solid #334155;
             transition: all 0.2s;
             cursor: pointer;
         }
+        .check-card:hover { background: #253349; }
+        .check-card.passed { border-left-color: #34d399; }
+        .check-card.failed { border-left-color: #f87171; }
         
-        .check-card:hover {
-            background: #253349;
-        }
-        
-        .check-card.passed {
-            border-left-color: #34d399;
-        }
-        
-        .check-card.failed {
-            border-left-color: #f87171;
-        }
-        
-        .check-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .check-name {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-        
-        .check-badges {
-            display: flex;
-            gap: 8px;
-        }
-        
+        .check-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .check-name { font-weight: 600; font-size: 0.95rem; }
+        .check-badges { display: flex; gap: 6px; }
         .badge {
-            padding: 3px 10px;
+            padding: 2px 8px;
             border-radius: 20px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
         .badge-critical { background: #991b1b; color: #fca5a5; }
         .badge-warning { background: #92400e; color: #fcd34d; }
         .badge-info { background: #1e3a5f; color: #93c5fd; }
         .badge-execucao { background: #1e3a5f; color: #93c5fd; }
         .badge-qualidade { background: #064e3b; color: #6ee7b7; }
+        .badge-mwaa { background: #4c1d95; color: #c4b5fd; }
         
-        .check-detail {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-top: 4px;
-        }
-        
-        .check-meta {
-            display: flex;
-            gap: 16px;
-            margin-top: 12px;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
+        .check-detail { color: #94a3b8; font-size: 0.85rem; margin-top: 4px; }
+        .check-meta { display: flex; gap: 16px; margin-top: 8px; font-size: 0.75rem; color: #64748b; }
         
         .check-data {
             display: none;
-            margin-top: 16px;
+            margin-top: 12px;
             background: #0f172a;
             border-radius: 8px;
-            padding: 16px;
+            padding: 12px;
             overflow-x: auto;
         }
+        .check-data.visible { display: block; }
+        .check-data table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .check-data th { text-align: left; padding: 6px 10px; border-bottom: 1px solid #334155; color: #94a3b8; font-weight: 600; }
+        .check-data td { padding: 5px 10px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
         
-        .check-data.visible {
-            display: block;
+        /* MWAA Section */
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .check-data table {
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .chart-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #334155;
+        }
+        
+        .chart-card h3 {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        
+        .chart-container { position: relative; height: 250px; }
+        
+        /* Timeline table */
+        .timeline-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.8rem;
+            margin-top: 12px;
         }
-        
-        .check-data th {
+        .timeline-table th {
             text-align: left;
             padding: 8px 12px;
             border-bottom: 1px solid #334155;
             color: #94a3b8;
             font-weight: 600;
         }
-        
-        .check-data td {
+        .timeline-table td {
             padding: 6px 12px;
             border-bottom: 1px solid #1e293b;
             color: #cbd5e1;
         }
+        .timeline-table tr:hover { background: #253349; }
         
-        .status-icon {
-            font-size: 1.2rem;
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
+        .status-success { background: #064e3b; color: #6ee7b7; }
+        .status-failed { background: #991b1b; color: #fca5a5; }
+        .status-running { background: #92400e; color: #fcd34d; }
+        .status-late { background: #92400e; color: #fcd34d; }
+        .status-ontime { background: #064e3b; color: #6ee7b7; }
         
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #475569;
-            font-size: 0.8rem;
-        }
+        .footer { text-align: center; margin-top: 40px; color: #475569; font-size: 0.8rem; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🔍 Qualidade dos Dados - Captação</h1>
-        <p class="subtitle">Validação automática das tabelas <code>tb_captacao_analitica</code> e <code>tb_captacao_comercial</code></p>
+        <p class="subtitle">Validação automática · <code>tb_captacao_analitica</code> · <code>tb_captacao_comercial</code> · DAGs MWAA</p>
     </div>
     
     <div class="summary" id="summary"></div>
     
-    <div class="filters" id="filters"></div>
+    <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="checks">📋 Checks de Qualidade</button>
+        <button class="tab" data-tab="mwaa-status">🚀 Status Execuções</button>
+        <button class="tab" data-tab="mwaa-tempo">⏱️ Tempo de Execução</button>
+        <button class="tab" data-tab="mwaa-falhas">⚠️ Histórico de Falhas</button>
+        <button class="tab" data-tab="mwaa-horario">🕐 Horário de Conclusão</button>
+    </div>
     
-    <div class="checks-grid" id="checks-grid"></div>
+    <!-- Tab: Checks -->
+    <div class="tab-content active" id="tab-checks">
+        <div class="filters" id="filters"></div>
+        <div class="checks-grid" id="checks-grid"></div>
+    </div>
+    
+    <!-- Tab: Status Execuções -->
+    <div class="tab-content" id="tab-mwaa-status">
+        <div class="section-title">🚀 Status das Execuções (últimos 14 dias)</div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>CRESCIMENTO_CAPTACAO - Execuções por dia</h3>
+                <div class="chart-container"><canvas id="chart-status-captacao"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3>CRESCIMENTO_CAPCOM - Execuções por dia</h3>
+                <div class="chart-container"><canvas id="chart-status-capcom"></canvas></div>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Detalhamento diário</h3>
+            <div style="overflow-x:auto;" id="table-status"></div>
+        </div>
+    </div>
+    
+    <!-- Tab: Tempo de Execução -->
+    <div class="tab-content" id="tab-mwaa-tempo">
+        <div class="section-title">⏱️ Tempo de Execução</div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>Duração (minutos) - CRESCIMENTO_CAPTACAO</h3>
+                <div class="chart-container"><canvas id="chart-tempo-captacao"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3>Duração (minutos) - CRESCIMENTO_CAPCOM</h3>
+                <div class="chart-container"><canvas id="chart-tempo-capcom"></canvas></div>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Detalhamento</h3>
+            <div style="overflow-x:auto;" id="table-tempo"></div>
+        </div>
+    </div>
+    
+    <!-- Tab: Histórico de Falhas -->
+    <div class="tab-content" id="tab-mwaa-falhas">
+        <div class="section-title">⚠️ Histórico de Falhas (últimos 14 dias)</div>
+        <div class="chart-card">
+            <div id="table-falhas"></div>
+        </div>
+    </div>
+    
+    <!-- Tab: Horário de Conclusão -->
+    <div class="tab-content" id="tab-mwaa-horario">
+        <div class="section-title">🕐 Horário de Conclusão (BRT)</div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>Horário de término - CRESCIMENTO_CAPTACAO</h3>
+                <div class="chart-container"><canvas id="chart-horario-captacao"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3>Horário de término - CRESCIMENTO_CAPCOM</h3>
+                <div class="chart-container"><canvas id="chart-horario-capcom"></canvas></div>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Detalhamento</h3>
+            <div style="overflow-x:auto;" id="table-horario"></div>
+        </div>
+    </div>
     
     <div class="footer">
-        <p>Gerado em <span id="dt-geracao"></span> | Plataforma de Dados - Cogna</p>
+        <p>Gerado em <span id="dt-geracao"></span> | Plataforma de Dados — Cogna Educação</p>
     </div>
 
     <script>
-    const dados = {"dt_execucao": "2026-05-21T10:50:55.975278", "resumo": {"total": 11, "passou": 9, "falhou": 2}, "checks": [{"nome": "Execução do dia - Captação Analítica", "categoria": "execucao", "severidade": "critical", "passou": true, "detalhe": "Última execução: 2026-05-21", "esperado": "Execução na data de hoje", "encontrado": "2026-05-21", "dados": null, "dt_verificacao": "2026-05-21T10:50:04.381797"}, {"nome": "Execução do dia - Captação Comercial", "categoria": "execucao", "severidade": "critical", "passou": true, "detalhe": "Última execução: 2026-05-21", "esperado": "Execução na data de hoje", "encontrado": "2026-05-21", "dados": null, "dt_verificacao": "2026-05-21T10:50:09.300275"}, {"nome": "Volume diário - Captação Analítica", "categoria": "execucao", "severidade": "warning", "passou": true, "detalhe": "Volume hoje: 3,013,663 | Ontem: 3,007,168 | Variação: 0.2%", "esperado": "Variação >= -20%", "encontrado": "0.2%", "dados": [{"dt": "2026-05-21", "total_registros": "3013663"}, {"dt": "2026-05-20", "total_registros": "3007168"}, {"dt": "2026-05-19", "total_registros": "3000219"}, {"dt": "2026-05-18", "total_registros": "2993223"}, {"dt": "2026-05-17", "total_registros": "2993223"}, {"dt": "2026-05-16", "total_registros": "2988684"}, {"dt": "2026-05-15", "total_registros": "2982374"}, {"dt": "2026-05-14", "total_registros": "2974896"}], "dt_verificacao": "2026-05-21T10:50:14.210009"}, {"nome": "Volume diário - Captação Comercial", "categoria": "execucao", "severidade": "warning", "passou": true, "detalhe": "Volume hoje: 3,009,867 | Ontem: 3,003,372 | Variação: 0.2%", "esperado": "Variação >= -20%", "encontrado": "0.2%", "dados": [{"dt": "2026-05-21", "total_registros": "3009867"}, {"dt": "2026-05-20", "total_registros": "3003372"}, {"dt": "2026-05-19", "total_registros": "2996423"}, {"dt": "2026-05-18", "total_registros": "2989427"}, {"dt": "2026-05-17", "total_registros": "2989427"}, {"dt": "2026-05-16", "total_registros": "2984891"}, {"dt": "2026-05-15", "total_registros": "2978581"}, {"dt": "2026-05-14", "total_registros": "2971103"}], "dt_verificacao": "2026-05-21T10:50:19.131204"}, {"nome": "View Captação Analítica não vazia", "categoria": "execucao", "severidade": "critical", "passou": true, "detalhe": "View contém 2,851,590 registros", "esperado": "> 0 registros", "encontrado": "2851590", "dados": null, "dt_verificacao": "2026-05-21T10:50:21.900923"}, {"nome": "Ciclos presentes na Analítica", "categoria": "qualidade", "severidade": "info", "passou": true, "detalhe": "Ciclos encontrados: 20262 (44,490 reg, 2,437 mat), 20261 (2,969,173 reg, 426,113 mat)", "esperado": "Ao menos 1 ciclo com registros", "encontrado": "2 ciclo(s)", "dados": [{"ciclo": "20262", "total_registros": "44490", "total_matriculados": "2437", "total_inscritos": "44490"}, {"ciclo": "20261", "total_registros": "2969173", "total_matriculados": "426113", "total_inscritos": "2969173"}], "dt_verificacao": "2026-05-21T10:50:28.964969"}, {"nome": "Volumetria HUNTER - Analítica", "categoria": "qualidade", "severidade": "warning", "passou": true, "detalhe": "Evolução normal", "esperado": null, "encontrado": null, "dados": [{"dt_base": "20260521", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "183006", "variacao_dia": "421"}, {"dt_base": "20260520", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "182585", "variacao_dia": "412"}, {"dt_base": "20260519", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "182173", "variacao_dia": "737"}, {"dt_base": "20260518", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "181436", "variacao_dia": "0"}, {"dt_base": "20260517", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "181436", "variacao_dia": "94"}, {"dt_base": "20260516", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "181342", "variacao_dia": "343"}, {"dt_base": "20260515", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "180999", "variacao_dia": "295"}, {"dt_base": "20260514", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "180704", "variacao_dia": "308"}, {"dt_base": "20260513", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "180396", "variacao_dia": "293"}, {"dt_base": "20260512", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "180103", "variacao_dia": "277"}], "dt_verificacao": "2026-05-21T10:50:31.767629"}, {"nome": "Volumetria HUNTER - Comercial", "categoria": "qualidade", "severidade": "warning", "passou": true, "detalhe": "Evolução normal", "esperado": null, "encontrado": null, "dados": [{"dt_base": "20260521", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "183004", "variacao_dia": "421"}, {"dt_base": "20260520", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "182583", "variacao_dia": "412"}, {"dt_base": "20260519", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "182171", "variacao_dia": "737"}, {"dt_base": "20260518", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "181434", "variacao_dia": "0"}, {"dt_base": "20260517", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "181434", "variacao_dia": "94"}, {"dt_base": "20260516", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "181340", "variacao_dia": "343"}, {"dt_base": "20260515", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "180997", "variacao_dia": "295"}, {"dt_base": "20260514", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "180702", "variacao_dia": "308"}, {"dt_base": "20260513", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "180394", "variacao_dia": "293"}, {"dt_base": "20260512", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "180101", "variacao_dia": "277"}], "dt_verificacao": "2026-05-21T10:50:36.760063"}, {"nome": "Volumetria de Funil", "categoria": "qualidade", "severidade": "critical", "passou": true, "detalhe": "Funil consistente entre execuções", "esperado": "Matrículas não devem diminuir entre execuções", "encontrado": "{\"2026-05-21\": {\"inscrito\": 3013663, \"matriculado\": 428550}, \"2026-05-20\": {\"inscrito\": 3007168, \"matriculado\": 427637}}", "dados": [{"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20261", "ds_origem": "ATHENAS", "fl_inscrito": "2245346", "fl_inscrito_liquido": "2231577", "fl_aprovado": "1296729", "fl_aprovado_liquido": "1284212", "fl_matriculado": "331044", "fl_matriculado_liquido": "320190"}, {"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20261", "ds_origem": "COLABORAR", "fl_inscrito": "46892", "fl_inscrito_liquido": "46812", "fl_aprovado": "41387", "fl_aprovado_liquido": "41307", "fl_matriculado": "26944", "fl_matriculado_liquido": "26875"}, {"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20261", "ds_origem": "OLIMPO", "fl_inscrito": "676935", "fl_inscrito_liquido": "670296", "fl_aprovado": "469420", "fl_aprovado_liquido": "463825", "fl_matriculado": "68125", "fl_matriculado_liquido": "63920"}, {"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20262", "ds_origem": "ATHENAS", "fl_inscrito": "11831", "fl_inscrito_liquido": "11830", "fl_aprovado": "6626", "fl_aprovado_liquido": "6625", "fl_matriculado": "1303", "fl_matriculado_liquido": "1303"}, {"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20262", "ds_origem": "COLABORAR", "fl_inscrito": "117", "fl_inscrito_liquido": "117", "fl_aprovado": "86", "fl_aprovado_liquido": "86", "fl_matriculado": "8", "fl_matriculado_liquido": "8"}, {"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20262", "ds_origem": "OLIMPO", "fl_inscrito": "32542", "fl_inscrito_liquido": "32503", "fl_aprovado": "19931", "fl_aprovado_liquido": "19894", "fl_matriculado": "1126", "fl_matriculado_liquido": "1126"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20261", "ds_origem": "ATHENAS", "fl_inscrito": "2245171", "fl_inscrito_liquido": "2231413", "fl_aprovado": "1296379", "fl_aprovado_liquido": "1283873", "fl_matriculado": "330812", "fl_matriculado_liquido": "319959"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20261", "ds_origem": "COLABORAR", "fl_inscrito": "46852", "fl_inscrito_liquido": "46773", "fl_aprovado": "41349", "fl_aprovado_liquido": "41270", "fl_matriculado": "26918", "fl_matriculado_liquido": "26850"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20261", "ds_origem": "OLIMPO", "fl_inscrito": "676555", "fl_inscrito_liquido": "669929", "fl_aprovado": "468995", "fl_aprovado_liquido": "463405", "fl_matriculado": "68137", "fl_matriculado_liquido": "63929"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20262", "ds_origem": "ATHENAS", "fl_inscrito": "8289", "fl_inscrito_liquido": "8289", "fl_aprovado": "4514", "fl_aprovado_liquido": "4514", "fl_matriculado": "838", "fl_matriculado_liquido": "838"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20262", "ds_origem": "COLABORAR", "fl_inscrito": "77", "fl_inscrito_liquido": "77", "fl_aprovado": "56", "fl_aprovado_liquido": "56", "fl_matriculado": "4", "fl_matriculado_liquido": "4"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20262", "ds_origem": "OLIMPO", "fl_inscrito": "30224", "fl_inscrito_liquido": "30187", "fl_aprovado": "18037", "fl_aprovado_liquido": "18002", "fl_matriculado": "928", "fl_matriculado_liquido": "928"}], "dt_verificacao": "2026-05-21T10:50:43.889997"}, {"nome": "Consistência Analítica vs Comercial", "categoria": "qualidade", "severidade": "critical", "passou": false, "detalhe": "Analítica: 428,550 | Comercial: 428,543 | Δ: -7", "esperado": "Comercial >= Analítica (efeito interciclo)", "encontrado": "Diferença: -7", "dados": null, "dt_verificacao": "2026-05-21T10:50:48.853865"}, {"nome": "Alunado vs Captação", "categoria": "qualidade", "severidade": "warning", "passou": false, "detalhe": "Divergências: ATHENAS ciclo 20261: Δ=568; ATHENAS ciclo 20262: Δ=-567", "esperado": "Diferença <= 50 (exceto Colaborar)", "encontrado": null, "dados": [{"nr_ciclo_ingresso": "20261", "origem": "ATHENAS", "mat_captacao": "331044", "mat_alunado": "330476", "diferenca": "568"}, {"nr_ciclo_ingresso": "20261", "origem": "COLABORAR", "mat_captacao": "26944", "mat_alunado": "26952", "diferenca": "-8"}, {"nr_ciclo_ingresso": "20261", "origem": "OLIMPO", "mat_captacao": "68125", "mat_alunado": "68125", "diferenca": "0"}, {"nr_ciclo_ingresso": "20262", "origem": "ATHENAS", "mat_captacao": "1303", "mat_alunado": "1870", "diferenca": "-567"}, {"nr_ciclo_ingresso": "20262", "origem": "COLABORAR", "mat_captacao": "8", "mat_alunado": "9", "diferenca": "-1"}, {"nr_ciclo_ingresso": "20262", "origem": "OLIMPO", "mat_captacao": "1126", "mat_alunado": "1126", "diferenca": "0"}], "dt_verificacao": "2026-05-21T10:50:55.971738"}]};
+    const dados = {"dt_execucao": "2026-05-21T11:51:52.084248", "resumo": {"total": 18, "passou": 16, "falhou": 2}, "checks": [{"nome": "Execução do dia - Captação Analítica", "categoria": "execucao", "severidade": "critical", "passou": true, "detalhe": "Última execução: 2026-05-21", "esperado": "Execução na data de hoje", "encontrado": "2026-05-21", "dados": null, "dt_verificacao": "2026-05-21T11:50:54.204694"}, {"nome": "Execução do dia - Captação Comercial", "categoria": "execucao", "severidade": "critical", "passou": true, "detalhe": "Última execução: 2026-05-21", "esperado": "Execução na data de hoje", "encontrado": "2026-05-21", "dados": null, "dt_verificacao": "2026-05-21T11:50:59.134417"}, {"nome": "Volume diário - Captação Analítica", "categoria": "execucao", "severidade": "warning", "passou": true, "detalhe": "Volume hoje: 3,013,663 | Ontem: 3,007,168 | Variação: 0.2%", "esperado": "Variação >= -20%", "encontrado": "0.2%", "dados": [{"dt": "2026-05-21", "total_registros": "3013663"}, {"dt": "2026-05-20", "total_registros": "3007168"}, {"dt": "2026-05-19", "total_registros": "3000219"}, {"dt": "2026-05-18", "total_registros": "2993223"}, {"dt": "2026-05-17", "total_registros": "2993223"}, {"dt": "2026-05-16", "total_registros": "2988684"}, {"dt": "2026-05-15", "total_registros": "2982374"}, {"dt": "2026-05-14", "total_registros": "2974896"}], "dt_verificacao": "2026-05-21T11:51:04.085859"}, {"nome": "Volume diário - Captação Comercial", "categoria": "execucao", "severidade": "warning", "passou": true, "detalhe": "Volume hoje: 3,009,867 | Ontem: 3,003,372 | Variação: 0.2%", "esperado": "Variação >= -20%", "encontrado": "0.2%", "dados": [{"dt": "2026-05-21", "total_registros": "3009867"}, {"dt": "2026-05-20", "total_registros": "3003372"}, {"dt": "2026-05-19", "total_registros": "2996423"}, {"dt": "2026-05-18", "total_registros": "2989427"}, {"dt": "2026-05-17", "total_registros": "2989427"}, {"dt": "2026-05-16", "total_registros": "2984891"}, {"dt": "2026-05-15", "total_registros": "2978581"}, {"dt": "2026-05-14", "total_registros": "2971103"}], "dt_verificacao": "2026-05-21T11:51:09.031350"}, {"nome": "View Captação Analítica não vazia", "categoria": "execucao", "severidade": "critical", "passou": true, "detalhe": "View contém 2,851,590 registros", "esperado": "> 0 registros", "encontrado": "2851590", "dados": null, "dt_verificacao": "2026-05-21T11:51:11.839814"}, {"nome": "Ciclos presentes na Analítica", "categoria": "qualidade", "severidade": "info", "passou": true, "detalhe": "Ciclos encontrados: 20262 (44,490 reg, 2,437 mat), 20261 (2,969,173 reg, 426,113 mat)", "esperado": "Ao menos 1 ciclo com registros", "encontrado": "2 ciclo(s)", "dados": [{"ciclo": "20262", "total_registros": "44490", "total_matriculados": "2437", "total_inscritos": "44490"}, {"ciclo": "20261", "total_registros": "2969173", "total_matriculados": "426113", "total_inscritos": "2969173"}], "dt_verificacao": "2026-05-21T11:51:16.798150"}, {"nome": "Volumetria HUNTER - Analítica", "categoria": "qualidade", "severidade": "warning", "passou": true, "detalhe": "Evolução normal", "esperado": null, "encontrado": null, "dados": [{"dt_base": "20260521", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "183006", "variacao_dia": "421"}, {"dt_base": "20260520", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "182585", "variacao_dia": "412"}, {"dt_base": "20260519", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "182173", "variacao_dia": "737"}, {"dt_base": "20260518", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "181436", "variacao_dia": "0"}, {"dt_base": "20260517", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "181436", "variacao_dia": "94"}, {"dt_base": "20260516", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "181342", "variacao_dia": "343"}, {"dt_base": "20260515", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "180999", "variacao_dia": "295"}, {"dt_base": "20260514", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "180704", "variacao_dia": "308"}, {"dt_base": "20260513", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "180396", "variacao_dia": "293"}, {"dt_base": "20260512", "ds_supercanal_vendas_2": "HUNTER", "qtd_matriculados": "180103", "variacao_dia": "277"}], "dt_verificacao": "2026-05-21T11:51:19.605057"}, {"nome": "Volumetria HUNTER - Comercial", "categoria": "qualidade", "severidade": "warning", "passou": true, "detalhe": "Evolução normal", "esperado": null, "encontrado": null, "dados": [{"dt_base": "20260521", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "183004", "variacao_dia": "421"}, {"dt_base": "20260520", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "182583", "variacao_dia": "412"}, {"dt_base": "20260519", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "182171", "variacao_dia": "737"}, {"dt_base": "20260518", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "181434", "variacao_dia": "0"}, {"dt_base": "20260517", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "181434", "variacao_dia": "94"}, {"dt_base": "20260516", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "181340", "variacao_dia": "343"}, {"dt_base": "20260515", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "180997", "variacao_dia": "295"}, {"dt_base": "20260514", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "180702", "variacao_dia": "308"}, {"dt_base": "20260513", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "180394", "variacao_dia": "293"}, {"dt_base": "20260512", "ds_supercanal_vendas": "HUNTER", "qtd_matriculados": "180101", "variacao_dia": "277"}], "dt_verificacao": "2026-05-21T11:51:24.576537"}, {"nome": "Volumetria de Funil", "categoria": "qualidade", "severidade": "critical", "passou": true, "detalhe": "Funil consistente entre execuções", "esperado": "Matrículas não devem diminuir entre execuções", "encontrado": "{\"2026-05-21\": {\"inscrito\": 3013663, \"matriculado\": 428550}, \"2026-05-20\": {\"inscrito\": 3007168, \"matriculado\": 427637}}", "dados": [{"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20261", "ds_origem": "ATHENAS", "fl_inscrito": "2245346", "fl_inscrito_liquido": "2231577", "fl_aprovado": "1296729", "fl_aprovado_liquido": "1284212", "fl_matriculado": "331044", "fl_matriculado_liquido": "320190"}, {"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20261", "ds_origem": "COLABORAR", "fl_inscrito": "46892", "fl_inscrito_liquido": "46812", "fl_aprovado": "41387", "fl_aprovado_liquido": "41307", "fl_matriculado": "26944", "fl_matriculado_liquido": "26875"}, {"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20261", "ds_origem": "OLIMPO", "fl_inscrito": "676935", "fl_inscrito_liquido": "670296", "fl_aprovado": "469420", "fl_aprovado_liquido": "463825", "fl_matriculado": "68125", "fl_matriculado_liquido": "63920"}, {"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20262", "ds_origem": "ATHENAS", "fl_inscrito": "11831", "fl_inscrito_liquido": "11830", "fl_aprovado": "6626", "fl_aprovado_liquido": "6625", "fl_matriculado": "1303", "fl_matriculado_liquido": "1303"}, {"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20262", "ds_origem": "COLABORAR", "fl_inscrito": "117", "fl_inscrito_liquido": "117", "fl_aprovado": "86", "fl_aprovado_liquido": "86", "fl_matriculado": "8", "fl_matriculado_liquido": "8"}, {"dt_execucao": "2026-05-21", "nr_ciclo_ingresso": "20262", "ds_origem": "OLIMPO", "fl_inscrito": "32542", "fl_inscrito_liquido": "32503", "fl_aprovado": "19931", "fl_aprovado_liquido": "19894", "fl_matriculado": "1126", "fl_matriculado_liquido": "1126"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20261", "ds_origem": "ATHENAS", "fl_inscrito": "2245171", "fl_inscrito_liquido": "2231413", "fl_aprovado": "1296379", "fl_aprovado_liquido": "1283873", "fl_matriculado": "330812", "fl_matriculado_liquido": "319959"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20261", "ds_origem": "COLABORAR", "fl_inscrito": "46852", "fl_inscrito_liquido": "46773", "fl_aprovado": "41349", "fl_aprovado_liquido": "41270", "fl_matriculado": "26918", "fl_matriculado_liquido": "26850"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20261", "ds_origem": "OLIMPO", "fl_inscrito": "676555", "fl_inscrito_liquido": "669929", "fl_aprovado": "468995", "fl_aprovado_liquido": "463405", "fl_matriculado": "68137", "fl_matriculado_liquido": "63929"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20262", "ds_origem": "ATHENAS", "fl_inscrito": "8289", "fl_inscrito_liquido": "8289", "fl_aprovado": "4514", "fl_aprovado_liquido": "4514", "fl_matriculado": "838", "fl_matriculado_liquido": "838"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20262", "ds_origem": "COLABORAR", "fl_inscrito": "77", "fl_inscrito_liquido": "77", "fl_aprovado": "56", "fl_aprovado_liquido": "56", "fl_matriculado": "4", "fl_matriculado_liquido": "4"}, {"dt_execucao": "2026-05-20", "nr_ciclo_ingresso": "20262", "ds_origem": "OLIMPO", "fl_inscrito": "30224", "fl_inscrito_liquido": "30187", "fl_aprovado": "18037", "fl_aprovado_liquido": "18002", "fl_matriculado": "928", "fl_matriculado_liquido": "928"}], "dt_verificacao": "2026-05-21T11:51:31.696711"}, {"nome": "Consistência Analítica vs Comercial", "categoria": "qualidade", "severidade": "critical", "passou": false, "detalhe": "Analítica: 428,550 | Comercial: 428,543 | Δ: -7", "esperado": "Comercial >= Analítica (efeito interciclo)", "encontrado": "Diferença: -7", "dados": null, "dt_verificacao": "2026-05-21T11:51:38.782058"}, {"nome": "Alunado vs Captação", "categoria": "qualidade", "severidade": "warning", "passou": false, "detalhe": "Divergências: ATHENAS ciclo 20261: Δ=568; ATHENAS ciclo 20262: Δ=-567", "esperado": "Diferença <= 50 (exceto Colaborar)", "encontrado": null, "dados": [{"nr_ciclo_ingresso": "20261", "origem": "ATHENAS", "mat_captacao": "331044", "mat_alunado": "330476", "diferenca": "568"}, {"nr_ciclo_ingresso": "20261", "origem": "COLABORAR", "mat_captacao": "26944", "mat_alunado": "26952", "diferenca": "-8"}, {"nr_ciclo_ingresso": "20261", "origem": "OLIMPO", "mat_captacao": "68125", "mat_alunado": "68125", "diferenca": "0"}, {"nr_ciclo_ingresso": "20262", "origem": "ATHENAS", "mat_captacao": "1303", "mat_alunado": "1870", "diferenca": "-567"}, {"nr_ciclo_ingresso": "20262", "origem": "COLABORAR", "mat_captacao": "8", "mat_alunado": "9", "diferenca": "-1"}, {"nr_ciclo_ingresso": "20262", "origem": "OLIMPO", "mat_captacao": "1126", "mat_alunado": "1126", "diferenca": "0"}], "dt_verificacao": "2026-05-21T11:51:45.885743"}, {"nome": "Última execução - CRESCIMENTO_CAPTACAO", "categoria": "mwaa", "severidade": "info", "passou": true, "detalhe": "2026-05-21: 1 sucesso, 0 falha(s)", "esperado": "Execução com sucesso", "encontrado": "success=1, failed=0", "dados": null, "dt_verificacao": "2026-05-21T11:51:52.069783"}, {"nome": "Última execução - CRESCIMENTO_CAPCOM", "categoria": "mwaa", "severidade": "info", "passou": true, "detalhe": "2026-05-21: 1 sucesso, 0 falha(s)", "esperado": "Execução com sucesso", "encontrado": "success=1, failed=0", "dados": null, "dt_verificacao": "2026-05-21T11:51:52.069830"}, {"nome": "Tempo de execução - CRESCIMENTO_CAPTACAO", "categoria": "mwaa", "severidade": "info", "passou": true, "detalhe": "Última: 41min | Média (16 runs): 76min | Ratio: 0.5x", "esperado": "Duração < 2x a média", "encontrado": "41min (0.5x a média)", "dados": null, "dt_verificacao": "2026-05-21T11:51:52.069899"}, {"nome": "Tempo de execução - CRESCIMENTO_CAPCOM", "categoria": "mwaa", "severidade": "info", "passou": true, "detalhe": "Última: 31min | Média (22 runs): 26min | Ratio: 1.2x", "esperado": "Duração < 2x a média", "encontrado": "31min (1.2x a média)", "dados": null, "dt_verificacao": "2026-05-21T11:51:52.069947"}, {"nome": "Horário de conclusão - CRESCIMENTO_CAPTACAO", "categoria": "mwaa", "severidade": "info", "passou": true, "detalhe": "Concluiu às 09:34 (BRT) em 2026-05-21", "esperado": "Conclusão até 16:00 BRT", "encontrado": "09:34", "dados": null, "dt_verificacao": "2026-05-21T11:51:52.069972"}, {"nome": "Horário de conclusão - CRESCIMENTO_CAPCOM", "categoria": "mwaa", "severidade": "info", "passou": true, "detalhe": "Concluiu às 09:33 (BRT) em 2026-05-21", "esperado": "Conclusão até 16:00 BRT", "encontrado": "09:33", "dados": null, "dt_verificacao": "2026-05-21T11:51:52.069994"}, {"nome": "Falhas recentes (últimos 14 dias)", "categoria": "mwaa", "severidade": "info", "passou": true, "detalhe": "Nenhuma falha nos últimos 14 dias", "esperado": "≤ 2 falhas em 14 dias", "encontrado": "0 falhas", "dados": null, "dt_verificacao": "2026-05-21T11:51:52.070005"}], "mwaa": {"status_execucoes": [{"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-21", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-20", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-19", "success": 2, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-17", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-16", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-15", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-14", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-13", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-12", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-11", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-10", "success": 2, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-09", "success": 2, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-08", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-21", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-20", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-19", "success": 3, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-18", "success": 2, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-17", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-16", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-15", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-14", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-13", "success": 4, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-12", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-11", "success": 1, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-10", "success": 2, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-09", "success": 2, "failed": 0, "running": 0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-08", "success": 1, "failed": 0, "running": 0}], "tempo_execucao": [{"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-21", "inicio": "2026-05-21T11:53:18.279550+00:00", "fim": "2026-05-21T12:34:07.578662+00:00", "duracao_min": 40.8}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-21", "inicio": "2026-05-21T12:01:59.243838+00:00", "fim": "2026-05-21T12:33:08.932597+00:00", "duracao_min": 31.2}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-20", "inicio": "2026-05-20T10:34:10.006667+00:00", "fim": "2026-05-20T11:21:06.976488+00:00", "duracao_min": 46.9}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-20", "inicio": "2026-05-20T10:45:58.672711+00:00", "fim": "2026-05-20T11:20:05.175302+00:00", "duracao_min": 34.1}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-19", "inicio": "2026-05-19T10:51:31.404893+00:00", "fim": "2026-05-19T11:46:18.936269+00:00", "duracao_min": 54.8}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-19", "inicio": "2026-05-19T00:14:58.145577+00:00", "fim": "2026-05-19T00:44:12.831431+00:00", "duracao_min": 29.2}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-19", "inicio": "2026-05-19T13:41:12.110869+00:00", "fim": "2026-05-19T13:43:38.252525+00:00", "duracao_min": 2.4}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-19", "inicio": "2026-05-19T10:52:57.007051+00:00", "fim": "2026-05-19T11:21:37.131960+00:00", "duracao_min": 28.7}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-19", "inicio": "2026-05-19T00:19:07.032157+00:00", "fim": "2026-05-19T00:43:57.611681+00:00", "duracao_min": 24.8}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-18", "inicio": "2026-05-18T11:47:49.237077+00:00", "fim": "2026-05-18T12:22:22.975864+00:00", "duracao_min": 34.6}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-18", "inicio": "2026-05-18T11:03:36.166528+00:00", "fim": "2026-05-18T11:29:57.116272+00:00", "duracao_min": 26.3}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-17", "inicio": "2026-05-17T10:00:32.921879+00:00", "fim": "2026-05-17T11:23:48.262822+00:00", "duracao_min": 83.3}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-17", "inicio": "2026-05-17T10:55:42.604377+00:00", "fim": "2026-05-17T11:22:55.041786+00:00", "duracao_min": 27.2}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-16", "inicio": "2026-05-16T10:10:25.733369+00:00", "fim": "2026-05-16T11:24:08.659963+00:00", "duracao_min": 73.7}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-16", "inicio": "2026-05-16T10:52:00.789194+00:00", "fim": "2026-05-16T11:23:34.618494+00:00", "duracao_min": 31.6}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-15", "inicio": "2026-05-15T10:00:27.190506+00:00", "fim": "2026-05-15T12:57:13.071945+00:00", "duracao_min": 176.8}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-15", "inicio": "2026-05-15T12:32:06.784471+00:00", "fim": "2026-05-15T12:56:54.317552+00:00", "duracao_min": 24.8}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-14", "inicio": "2026-05-14T10:38:41.149990+00:00", "fim": "2026-05-14T11:38:32.260266+00:00", "duracao_min": 59.9}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-14", "inicio": "2026-05-14T11:12:23.372131+00:00", "fim": "2026-05-14T11:38:03.308734+00:00", "duracao_min": 25.7}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-13", "inicio": "2026-05-13T20:59:39.617000+00:00", "fim": "2026-05-13T21:36:19.901122+00:00", "duracao_min": 36.7}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-13", "inicio": "2026-05-13T21:03:13.423101+00:00", "fim": "2026-05-13T21:35:32.349757+00:00", "duracao_min": 32.3}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-13", "inicio": "2026-05-13T14:25:14.986291+00:00", "fim": "2026-05-13T14:49:53.959684+00:00", "duracao_min": 24.6}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-13", "inicio": "2026-05-13T13:37:06.515564+00:00", "fim": "2026-05-13T13:43:21.113105+00:00", "duracao_min": 6.2}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-13", "inicio": "2026-05-13T13:03:22.675428+00:00", "fim": "2026-05-13T13:37:06.132835+00:00", "duracao_min": 33.7}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-12", "inicio": "2026-05-12T09:55:35.595060+00:00", "fim": "2026-05-12T11:16:56.669149+00:00", "duracao_min": 81.4}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-12", "inicio": "2026-05-12T14:10:20.351977+00:00", "fim": "2026-05-12T14:24:30.235789+00:00", "duracao_min": 14.2}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-11", "inicio": "2026-05-11T10:05:44.207883+00:00", "fim": "2026-05-11T11:17:31.025475+00:00", "duracao_min": 71.8}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-11", "inicio": "2026-05-11T22:37:39.437564+00:00", "fim": "2026-05-11T22:42:32.230531+00:00", "duracao_min": 4.9}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-10", "inicio": "2026-05-10T11:45:07.576020+00:00", "fim": "2026-05-10T13:03:56.634684+00:00", "duracao_min": 78.8}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-10", "inicio": "2026-05-10T10:00:32.928730+00:00", "fim": "2026-05-10T11:45:07.010942+00:00", "duracao_min": 104.6}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-10", "inicio": "2026-05-10T12:21:51.350630+00:00", "fim": "2026-05-10T13:03:42.502193+00:00", "duracao_min": 41.9}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-10", "inicio": "2026-05-10T11:04:00.911426+00:00", "fim": "2026-05-10T11:44:24.653319+00:00", "duracao_min": 40.4}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-09", "inicio": "2026-05-09T11:47:23.012077+00:00", "fim": "2026-05-09T12:56:23.430511+00:00", "duracao_min": 69.0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-09", "inicio": "2026-05-09T10:00:53.254937+00:00", "fim": "2026-05-09T11:47:22.568521+00:00", "duracao_min": 106.5}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-09", "inicio": "2026-05-09T12:24:17.855703+00:00", "fim": "2026-05-09T12:55:37.839103+00:00", "duracao_min": 31.3}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-09", "inicio": "2026-05-09T11:14:15.975916+00:00", "fim": "2026-05-09T11:46:18.164521+00:00", "duracao_min": 32.0}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-08", "inicio": "2026-05-08T10:31:35.234223+00:00", "fim": "2026-05-08T12:18:33.769201+00:00", "duracao_min": 107.0}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-08", "inicio": "2026-05-08T11:57:09.468412+00:00", "fim": "2026-05-08T12:17:39.457477+00:00", "duracao_min": 20.5}], "historico_falhas": [], "horario_conclusao": [{"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-21", "horario_utc": "2026-05-21T12:34:07.578662+00:00", "horario_brt": "09:34", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-21", "horario_utc": "2026-05-21T12:33:08.932597+00:00", "horario_brt": "09:33", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-20", "horario_utc": "2026-05-20T11:21:06.976488+00:00", "horario_brt": "08:21", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-20", "horario_utc": "2026-05-20T11:20:05.175302+00:00", "horario_brt": "08:20", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-19", "horario_utc": "2026-05-19T11:46:18.936269+00:00", "horario_brt": "08:46", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-19", "horario_utc": "2026-05-19T00:44:12.831431+00:00", "horario_brt": "21:44", "atrasou": true}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-19", "horario_utc": "2026-05-19T13:43:38.252525+00:00", "horario_brt": "10:43", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-19", "horario_utc": "2026-05-19T11:21:37.131960+00:00", "horario_brt": "08:21", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-19", "horario_utc": "2026-05-19T00:43:57.611681+00:00", "horario_brt": "21:43", "atrasou": true}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-18", "horario_utc": "2026-05-18T12:22:22.975864+00:00", "horario_brt": "09:22", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-18", "horario_utc": "2026-05-18T11:29:57.116272+00:00", "horario_brt": "08:29", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-17", "horario_utc": "2026-05-17T11:23:48.262822+00:00", "horario_brt": "08:23", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-17", "horario_utc": "2026-05-17T11:22:55.041786+00:00", "horario_brt": "08:22", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-16", "horario_utc": "2026-05-16T11:24:08.659963+00:00", "horario_brt": "08:24", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-16", "horario_utc": "2026-05-16T11:23:34.618494+00:00", "horario_brt": "08:23", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-15", "horario_utc": "2026-05-15T12:57:13.071945+00:00", "horario_brt": "09:57", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-15", "horario_utc": "2026-05-15T12:56:54.317552+00:00", "horario_brt": "09:56", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-14", "horario_utc": "2026-05-14T11:38:32.260266+00:00", "horario_brt": "08:38", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-14", "horario_utc": "2026-05-14T11:38:03.308734+00:00", "horario_brt": "08:38", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-13", "horario_utc": "2026-05-13T21:36:19.901122+00:00", "horario_brt": "18:36", "atrasou": true}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-13", "horario_utc": "2026-05-13T21:35:32.349757+00:00", "horario_brt": "18:35", "atrasou": true}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-13", "horario_utc": "2026-05-13T14:49:53.959684+00:00", "horario_brt": "11:49", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-13", "horario_utc": "2026-05-13T13:43:21.113105+00:00", "horario_brt": "10:43", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-13", "horario_utc": "2026-05-13T13:37:06.132835+00:00", "horario_brt": "10:37", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-12", "horario_utc": "2026-05-12T11:16:56.669149+00:00", "horario_brt": "08:16", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-12", "horario_utc": "2026-05-12T14:24:30.235789+00:00", "horario_brt": "11:24", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-11", "horario_utc": "2026-05-11T11:17:31.025475+00:00", "horario_brt": "08:17", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-11", "horario_utc": "2026-05-11T22:42:32.230531+00:00", "horario_brt": "19:42", "atrasou": true}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-10", "horario_utc": "2026-05-10T13:03:56.634684+00:00", "horario_brt": "10:03", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-10", "horario_utc": "2026-05-10T11:45:07.010942+00:00", "horario_brt": "08:45", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-10", "horario_utc": "2026-05-10T13:03:42.502193+00:00", "horario_brt": "10:03", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-10", "horario_utc": "2026-05-10T11:44:24.653319+00:00", "horario_brt": "08:44", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-09", "horario_utc": "2026-05-09T12:56:23.430511+00:00", "horario_brt": "09:56", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-09", "horario_utc": "2026-05-09T11:47:22.568521+00:00", "horario_brt": "08:47", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-09", "horario_utc": "2026-05-09T12:55:37.839103+00:00", "horario_brt": "09:55", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-09", "horario_utc": "2026-05-09T11:46:18.164521+00:00", "horario_brt": "08:46", "atrasou": false}, {"dag": "CRESCIMENTO_CAPTACAO", "data": "2026-05-08", "horario_utc": "2026-05-08T12:18:33.769201+00:00", "horario_brt": "09:18", "atrasou": false}, {"dag": "CRESCIMENTO_CAPCOM", "data": "2026-05-08", "horario_utc": "2026-05-08T12:17:39.457477+00:00", "horario_brt": "09:17", "atrasou": false}]}};
+    const mwaa = dados.mwaa || {};
     
-    // Render summary
+    // ==================== TABS ====================
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+    
+    // ==================== SUMMARY ====================
     function renderSummary() {
         const summary = document.getElementById('summary');
         const r = dados.resumo;
         const score = r.total > 0 ? Math.round((r.passou / r.total) * 100) : 0;
-        
         summary.innerHTML = `
-            <div class="summary-card">
-                <div class="value value-total">${r.total}</div>
-                <div class="label">Total de Checks</div>
-            </div>
-            <div class="summary-card">
-                <div class="value value-pass">${r.passou}</div>
-                <div class="label">Aprovados</div>
-            </div>
-            <div class="summary-card">
-                <div class="value value-fail">${r.falhou}</div>
-                <div class="label">Falhas</div>
-            </div>
-            <div class="summary-card">
-                <div class="value value-score">${score}%</div>
-                <div class="label">Score de Saúde</div>
-            </div>
+            <div class="summary-card"><div class="value value-total">${r.total}</div><div class="label">Total Checks</div></div>
+            <div class="summary-card"><div class="value value-pass">${r.passou}</div><div class="label">Aprovados</div></div>
+            <div class="summary-card"><div class="value value-fail">${r.falhou}</div><div class="label">Falhas</div></div>
+            <div class="summary-card"><div class="value value-score">${score}%</div><div class="label">Score Saúde</div></div>
         `;
     }
     
-    // Render filters
+    // ==================== CHECKS ====================
     function renderFilters() {
         const filters = document.getElementById('filters');
         filters.innerHTML = `
@@ -269,9 +323,8 @@
             <button class="filter-btn" data-filter="passed">✅ Aprovados</button>
             <button class="filter-btn" data-filter="execucao">🔄 Execução</button>
             <button class="filter-btn" data-filter="qualidade">📊 Qualidade</button>
-            <button class="filter-btn" data-filter="critical">🔴 Críticos</button>
+            <button class="filter-btn" data-filter="mwaa">🚀 MWAA</button>
         `;
-        
         filters.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -281,26 +334,23 @@
         });
     }
     
-    // Render checks
     function renderChecks(filter = 'all') {
         const grid = document.getElementById('checks-grid');
         let checks = dados.checks;
-        
         if (filter === 'failed') checks = checks.filter(c => !c.passou);
         else if (filter === 'passed') checks = checks.filter(c => c.passou);
         else if (filter === 'execucao') checks = checks.filter(c => c.categoria === 'execucao');
         else if (filter === 'qualidade') checks = checks.filter(c => c.categoria === 'qualidade');
-        else if (filter === 'critical') checks = checks.filter(c => c.severidade === 'critical');
+        else if (filter === 'mwaa') checks = checks.filter(c => c.categoria === 'mwaa');
         
         grid.innerHTML = checks.map((check, idx) => {
             const statusClass = check.passou ? 'passed' : 'failed';
             const icon = check.passou ? '✅' : '❌';
             const dataTable = check.dados ? buildDataTable(check.dados) : '';
-            
             return `
-                <div class="check-card ${statusClass}" onclick="toggleData(${idx})">
+                <div class="check-card ${statusClass}" onclick="toggleData('ck-${idx}')">
                     <div class="check-header">
-                        <span class="check-name"><span class="status-icon">${icon}</span> ${check.nome}</span>
+                        <span class="check-name">${icon} ${check.nome}</span>
                         <div class="check-badges">
                             <span class="badge badge-${check.categoria}">${check.categoria}</span>
                             <span class="badge badge-${check.severidade}">${check.severidade}</span>
@@ -311,35 +361,187 @@
                         ${check.esperado ? `<span>Esperado: ${check.esperado}</span>` : ''}
                         ${check.encontrado ? `<span>Encontrado: ${check.encontrado}</span>` : ''}
                     </div>
-                    ${dataTable ? `<div class="check-data" id="data-${idx}">${dataTable}</div>` : ''}
-                </div>
-            `;
+                    ${dataTable ? `<div class="check-data" id="ck-${idx}">${dataTable}</div>` : ''}
+                </div>`;
         }).join('');
     }
     
     function buildDataTable(data) {
         if (!data || data.length === 0) return '';
         const headers = Object.keys(data[0]);
-        return `
-            <table>
-                <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-                <tbody>${data.map(row => 
-                    `<tr>${headers.map(h => `<td>${row[h] || '-'}</td>`).join('')}</tr>`
-                ).join('')}</tbody>
-            </table>
-        `;
+        return `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+            <tbody>${data.map(row => `<tr>${headers.map(h => `<td>${row[h] || '-'}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
     }
     
-    function toggleData(idx) {
-        const el = document.getElementById(`data-${idx}`);
+    function toggleData(id) {
+        const el = document.getElementById(id);
         if (el) el.classList.toggle('visible');
     }
     
-    // Init
+    // ==================== MWAA: STATUS ====================
+    function renderStatusExecucoes() {
+        const statusData = mwaa.status_execucoes || [];
+        
+        // Charts
+        ['CRESCIMENTO_CAPTACAO', 'CRESCIMENTO_CAPCOM'].forEach((dag, i) => {
+            const dagData = statusData.filter(d => d.dag === dag).reverse();
+            const labels = dagData.map(d => d.data.slice(5));
+            const ctx = document.getElementById(i === 0 ? 'chart-status-captacao' : 'chart-status-capcom');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Sucesso', data: dagData.map(d => d.success), backgroundColor: '#34d399' },
+                        { label: 'Falha', data: dagData.map(d => d.failed), backgroundColor: '#f87171' },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { stacked: true, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+                        y: { stacked: true, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+                    }
+                }
+            });
+        });
+        
+        // Table
+        const table = document.getElementById('table-status');
+        if (statusData.length === 0) { table.innerHTML = '<p style="color:#94a3b8">Sem dados disponíveis</p>'; return; }
+        table.innerHTML = `<table class="timeline-table">
+            <thead><tr><th>Data</th><th>DAG</th><th>Sucesso</th><th>Falha</th><th>Status</th></tr></thead>
+            <tbody>${statusData.map(d => `<tr>
+                <td>${d.data}</td><td>${d.dag}</td>
+                <td>${d.success}</td><td>${d.failed}</td>
+                <td><span class="status-badge ${d.failed > 0 ? 'status-failed' : 'status-success'}">${d.failed > 0 ? 'FALHA' : 'OK'}</span></td>
+            </tr>`).join('')}</tbody></table>`;
+    }
+    
+    // ==================== MWAA: TEMPO ====================
+    function renderTempoExecucao() {
+        const tempoData = mwaa.tempo_execucao || [];
+        
+        ['CRESCIMENTO_CAPTACAO', 'CRESCIMENTO_CAPCOM'].forEach((dag, i) => {
+            const dagData = tempoData.filter(d => d.dag === dag).reverse();
+            const labels = dagData.map(d => d.data.slice(5));
+            const duracoes = dagData.map(d => d.duracao_min);
+            const media = duracoes.length > 0 ? duracoes.reduce((a, b) => a + b, 0) / duracoes.length : 0;
+            
+            const ctx = document.getElementById(i === 0 ? 'chart-tempo-captacao' : 'chart-tempo-capcom');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Duração (min)', data: duracoes, borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)', fill: true, tension: 0.3 },
+                        { label: 'Média', data: Array(labels.length).fill(media), borderColor: '#fbbf24', borderDash: [5,5], pointRadius: 0 },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+                    }
+                }
+            });
+        });
+        
+        // Table
+        const table = document.getElementById('table-tempo');
+        if (tempoData.length === 0) { table.innerHTML = '<p style="color:#94a3b8">Sem dados disponíveis</p>'; return; }
+        table.innerHTML = `<table class="timeline-table">
+            <thead><tr><th>Data</th><th>DAG</th><th>Duração (min)</th></tr></thead>
+            <tbody>${tempoData.slice(0, 20).map(d => `<tr>
+                <td>${d.data}</td><td>${d.dag}</td><td>${d.duracao_min}</td>
+            </tr>`).join('')}</tbody></table>`;
+    }
+    
+    // ==================== MWAA: FALHAS ====================
+    function renderHistoricoFalhas() {
+        const falhas = mwaa.historico_falhas || [];
+        const table = document.getElementById('table-falhas');
+        
+        if (falhas.length === 0) {
+            table.innerHTML = '<p style="color:#34d399;font-size:1.1rem;padding:20px;">✅ Nenhuma falha nos últimos 14 dias</p>';
+            return;
+        }
+        
+        table.innerHTML = `<table class="timeline-table">
+            <thead><tr><th>Data</th><th>DAG</th><th>Tasks que falharam</th></tr></thead>
+            <tbody>${falhas.map(f => `<tr>
+                <td>${f.data}</td>
+                <td>${f.dag}</td>
+                <td>${f.tasks_falharam.join(', ') || 'N/A'}</td>
+            </tr>`).join('')}</tbody></table>`;
+    }
+    
+    // ==================== MWAA: HORÁRIO ====================
+    function renderHorarioConclusao() {
+        const horarioData = mwaa.horario_conclusao || [];
+        
+        ['CRESCIMENTO_CAPTACAO', 'CRESCIMENTO_CAPCOM'].forEach((dag, i) => {
+            const dagData = horarioData.filter(d => d.dag === dag).reverse();
+            const labels = dagData.map(d => d.data.slice(5));
+            const horas = dagData.map(d => {
+                const parts = d.horario_brt.split(':');
+                return parseInt(parts[0]) + parseInt(parts[1]) / 60;
+            });
+            
+            const ctx = document.getElementById(i === 0 ? 'chart-horario-captacao' : 'chart-horario-capcom');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        { 
+                            label: 'Hora conclusão (BRT)', 
+                            data: horas, 
+                            backgroundColor: horas.map(h => h > 16 ? '#f87171' : '#34d399'),
+                            borderRadius: 4,
+                        },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { labels: { color: '#94a3b8' } },
+                        annotation: { annotations: { line1: { type: 'line', yMin: 16, yMax: 16, borderColor: '#fbbf24', borderDash: [5,5] } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+                        y: { min: 6, max: 22, ticks: { color: '#94a3b8', callback: v => v + ':00' }, grid: { color: '#1e293b' } }
+                    }
+                }
+            });
+        });
+        
+        // Table
+        const table = document.getElementById('table-horario');
+        if (horarioData.length === 0) { table.innerHTML = '<p style="color:#94a3b8">Sem dados disponíveis</p>'; return; }
+        table.innerHTML = `<table class="timeline-table">
+            <thead><tr><th>Data</th><th>DAG</th><th>Horário (BRT)</th><th>Status</th></tr></thead>
+            <tbody>${horarioData.slice(0, 20).map(d => `<tr>
+                <td>${d.data}</td><td>${d.dag}</td><td>${d.horario_brt}</td>
+                <td><span class="status-badge ${d.atrasou ? 'status-late' : 'status-ontime'}">${d.atrasou ? 'ATRASOU' : 'NO PRAZO'}</span></td>
+            </tr>`).join('')}</tbody></table>`;
+    }
+    
+    // ==================== INIT ====================
     document.getElementById('dt-geracao').textContent = new Date(dados.dt_execucao).toLocaleString('pt-BR');
     renderSummary();
     renderFilters();
     renderChecks();
+    renderStatusExecucoes();
+    renderTempoExecucao();
+    renderHistoricoFalhas();
+    renderHorarioConclusao();
     </script>
 </body>
 </html>
