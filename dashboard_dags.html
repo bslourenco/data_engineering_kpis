@@ -67,7 +67,6 @@
         .dag-id { font-size: 0.72rem; color: var(--text-secondary); font-family: 'Courier New', monospace; margin-top: 2px; }
         .timeline-section { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
         .timeline-section h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
-        .no-data-section { background: var(--card-bg); border-radius: 12px; padding: 2rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; text-align: center; }
         .footer { text-align: center; padding: 1.5rem; color: var(--text-secondary); font-size: 0.8rem; }
         .sort-icon { font-size: 0.7rem; margin-left: 0.3rem; opacity: 0.5; }
         @media (max-width: 768px) {
@@ -83,10 +82,10 @@
         <h1>&#x1F4CA; Dashboard Executivo — Pipelines DMC Campanhas</h1>
         <p class="subtitle">Monitoramento de execução das DAGs de carga de dados</p>
         <div class="header-meta">
-            <span>&#x1F4C5; Período: 23/06/2026 a 30/06/2026</span>
+            <span>&#x1F4C5; Período: 07/07/2026 a 14/07/2026</span>
             <span>&#x1F3E2; Ambiente: datax-gold-prd</span>
             <span>&#x2601;&#xFE0F; AWS Account: 785100678825</span>
-            <span>&#x1F550; Gerado em: 30/06/2026 17:01 BRT</span>
+            <span>&#x1F550; Gerado em: 14/07/2026 11:28 BRT</span>
         </div>
     </div>
 
@@ -94,19 +93,19 @@
         <!-- KPI Cards -->
         <div class="kpi-grid">
             <div class="kpi-card primary">
-                <div class="kpi-value">0</div>
+                <div class="kpi-value">5</div>
                 <div class="kpi-label">Total de Execuções</div>
             </div>
             <div class="kpi-card success">
-                <div class="kpi-value">0%</div>
+                <div class="kpi-value">80%</div>
                 <div class="kpi-label">Taxa de Sucesso</div>
             </div>
             <div class="kpi-card danger">
-                <div class="kpi-value">0</div>
+                <div class="kpi-value">1</div>
                 <div class="kpi-label">Falhas no Período</div>
             </div>
             <div class="kpi-card warning">
-                <div class="kpi-value">N/A</div>
+                <div class="kpi-value">18min</div>
                 <div class="kpi-label">Duração Média Geral</div>
             </div>
         </div>
@@ -165,16 +164,11 @@
                     <tbody id="tableBody"></tbody>
                 </table>
             </div>
-        <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-            <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">⚠️ Nenhuma execução encontrada no período</p>
-            <p style="font-size: 0.9rem;">As DAGs não foram executadas entre 23/06/2026 e 30/06/2026.</p>
-            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Verifique se as DAGs estão ativas no Airflow ou se houve algum bloqueio no agendamento.</p>
-        </div>
         </div>
 
         <!-- Timeline -->
         <div class="timeline-section">
-            <h3>&#x1F550; Linha do Tempo — Execuções Mais Recentes (30/06/2026)</h3>
+            <h3>&#x1F550; Linha do Tempo — Execuções Mais Recentes (14/07/2026)</h3>
             <div class="chart-container" style="height: 200px;">
                 <canvas id="chartTimeline"></canvas>
             </div>
@@ -186,15 +180,15 @@
     </div>
 
     <script>
-    // ==============================================================
-    // DATA (atualizado em 30/06/2026 17:01 BRT via API MWAA)
-    // ==============================================================
+    // ============================================================
+    // DATA (atualizado em 14/07/2026 11:28 BRT via API MWAA)
+    // ============================================================
     const dagData = [
         {
             table: "tb_tgt_dmc_ci_ex_aluno",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_ex_aluno",
             runs: [
-
+                { date: "13/07/2026", status: "failed", start: "15:29:58", end: "15:42:06", durationSec: 728 }
             ]
         },
         {
@@ -222,14 +216,17 @@
             table: "tb_tgt_dmc_ci_aluno",
             dagId: "business_dmc_campanhas_4045_dm_campanhas_wf_crg_fat_dmc_aluno",
             runs: [
-
+                { date: "14/07/2026", status: "success", start: "10:22:20", end: "10:42:50", durationSec: 1230 },
+                { date: "13/07/2026", status: "success", start: "15:01:59", end: "15:21:34", durationSec: 1175 },
+                { date: "07/07/2026", status: "success", start: "14:10:31", end: "14:32:13", durationSec: 1302 },
+                { date: "07/07/2026", status: "success", start: "10:27:55", end: "10:44:25", durationSec: 990 }
             ]
         }
     ];
 
-    // ==============================================================
+    // ============================================================
     // HELPERS
-    // ==============================================================
+    // ============================================================
     function formatDuration(seconds) {
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
@@ -243,9 +240,9 @@
         return name.replace("tb_tgt_dmc_ci_", "");
     }
 
-    // ==============================================================
+    // ============================================================
     // TABLE
-    // ==============================================================
+    // ============================================================
     let allRows = [];
     dagData.forEach(dag => {
         dag.runs.forEach(run => {
@@ -257,11 +254,6 @@
         const tbody = document.getElementById("tableBody");
         const filtered = filter === "all" ? allRows : allRows.filter(r => r.status === filter);
 
-        if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Nenhuma execução encontrada no período</td></tr>';
-            return;
-        }
-
         tbody.innerHTML = filtered.map(row => {
             let statusBadge;
             if (row.status === "success") statusBadge = '<span class="status-badge success">&#x2705; Sucesso</span>';
@@ -269,18 +261,18 @@
             else statusBadge = '<span class="status-badge running">&#x1F504; Em Execução</span>';
 
             return `
-                <tr>
-                    <td>
-                        <div class="dag-name">${row.table}</div>
-                        <div class="dag-id">${row.dagId}</div>
-                    </td>
-                    <td>${row.date}</td>
-                    <td>${statusBadge}</td>
-                    <td>${row.start}</td>
-                    <td>${row.end}</td>
-                    <td>${formatDuration(row.durationSec)}</td>
-                </tr>
-            `}).join("");
+            <tr>
+                <td>
+                    <div class="dag-name">${row.table}</div>
+                    <div class="dag-id">${row.dagId}</div>
+                </td>
+                <td>${row.date}</td>
+                <td>${statusBadge}</td>
+                <td>${row.start}</td>
+                <td>${row.end}</td>
+                <td>${formatDuration(row.durationSec)}</td>
+            </tr>
+        `}).join("");
     }
 
     // Filter buttons
@@ -309,16 +301,16 @@
 
     renderTable();
 
-    // ==============================================================
+    // ============================================================
     // CHARTS
-    // ==============================================================
+    // ============================================================
     const chartColors = {
         blue: '#1a73e8', green: '#0f9d58', red: '#ea4335',
         orange: '#f9ab00', purple: '#9c27b0', teal: '#009688'
     };
 
     // 1. Daily executions chart
-    const dates = ["23/06", "24/06", "25/06", "26/06", "27/06", "28/06", "29/06", "30/06"];
+    const dates = ["07/07", "13/07", "14/07"];
     const dailySuccess = dates.map(d => allRows.filter(r => r.date.startsWith(d) && r.status === "success").length);
     const dailyFailed = dates.map(d => allRows.filter(r => r.date.startsWith(d) && r.status === "failed").length);
     const dailyRunning = dates.map(d => allRows.filter(r => r.date.startsWith(d) && r.status === "running").length);
@@ -352,35 +344,36 @@
         type: "bar",
         data: {
             labels: dagNames,
-            datasets: [{ label: "Duração Média (min)", data: avgDurations, backgroundColor: [chartColors.blue, chartColors.purple, chartColors.teal, chartColors.orange, chartColors.green], borderRadius: 6 }]
+            datasets: [{ label: "Duração média (min)", data: avgDurations, backgroundColor: [chartColors.blue, chartColors.orange, chartColors.teal, chartColors.purple, chartColors.green], borderRadius: 6 }]
         },
         options: {
             responsive: true, maintainAspectRatio: false, indexAxis: "y",
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw} min` } } },
+            plugins: { legend: { display: false } },
             scales: { x: { beginAtZero: true, title: { display: true, text: "Minutos" } } }
         }
     });
 
     // 3. Success rate per DAG
     const successRates = dagData.map(d => {
-        if (d.runs.length === 0) return 0;
-        return Math.round((d.runs.filter(r => r.status === "success").length / d.runs.length) * 100);
+        const total = d.runs.length;
+        const success = d.runs.filter(r => r.status === "success").length;
+        return Math.round((success / total) * 100);
     });
 
     new Chart(document.getElementById("chartSuccessRate"), {
         type: "bar",
         data: {
             labels: dagNames,
-            datasets: [{ label: "Taxa de Sucesso (%)", data: successRates, backgroundColor: successRates.map(r => r >= 90 ? chartColors.green : r >= 70 ? chartColors.orange : chartColors.red), borderRadius: 6 }]
+            datasets: [{ label: "Taxa de Sucesso (%)", data: successRates, backgroundColor: successRates.map(r => r === 100 ? chartColors.green : r >= 80 ? chartColors.orange : chartColors.red), borderRadius: 6 }]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + "%" } } }
+            scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: "%" } } }
         }
     });
 
-    // 4. Status distribution (doughnut)
+    // 4. Status distribution (donut)
     const totalSuccess = allRows.filter(r => r.status === "success").length;
     const totalFailed = allRows.filter(r => r.status === "failed").length;
     const totalRunning = allRows.filter(r => r.status === "running").length;
@@ -392,41 +385,53 @@
             datasets: [{ data: [totalSuccess, totalFailed, totalRunning], backgroundColor: [chartColors.green, chartColors.red, chartColors.orange], borderWidth: 0 }]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: "bottom" } }
+            responsive: true, maintainAspectRatio: false, cutout: "65%",
+            plugins: {
+                legend: { position: "bottom" },
+                tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw / allRows.length * 100)}%)` } }
+            }
         }
     });
 
-    // 5. Timeline chart (most recent date)
-    const mostRecentDate = allRows.length > 0 ? allRows.sort((a,b) => {
-        const da = a.date.split("/").reverse().join("");
-        const db = b.date.split("/").reverse().join("");
-        return db.localeCompare(da);
-    })[0].date : "";
+    // 5. Timeline chart (most recent day with multiple DAGs)
+    const timelineDay = "14/07/2026";
+    let todayRuns = allRows.filter(r => r.date === timelineDay);
+    if (todayRuns.length <= 1) {
+        const dateCounts = {};
+        allRows.forEach(r => { dateCounts[r.date] = (dateCounts[r.date] || 0) + 1; });
+        const multiDays = Object.entries(dateCounts).filter(([d, c]) => c > 1).map(([d]) => d);
+        if (multiDays.length > 0) {
+            multiDays.sort((a, b) => {
+                const [da, ma, ya] = a.split("/").map(Number);
+                const [db, mb, yb] = b.split("/").map(Number);
+                return yb - ya || mb - ma || db - da;
+            });
+            const fallbackDay = multiDays[0];
+            todayRuns = allRows.filter(r => r.date === fallbackDay);
+            document.querySelector(".timeline-section h3").textContent = "\u{1F550} Linha do Tempo — Execuções Mais Recentes (" + fallbackDay + ")";
+        }
+    }
+    const timelineData = todayRuns.map(r => {
+        const [sh, sm] = r.start.split(":").map(Number);
+        const endTime = r.end === "---" ? sh + sm / 60 + 0.5 : (() => { const [eh, em] = r.end.split(":").map(Number); return eh + em / 60; })();
+        return { dag: shortTableName(r.table), start: sh + sm / 60, end: endTime, status: r.status };
+    });
 
-    const todayRuns = allRows.filter(r => r.date === mostRecentDate);
-    if (todayRuns.length > 0) {
-        const timelineLabels = todayRuns.map(r => shortTableName(r.table));
-        const startTimes = todayRuns.map(r => {
-            const parts = r.start.split(":");
-            return parseInt(parts[0]) + parseInt(parts[1])/60;
-        });
-        const durations = todayRuns.map(r => r.durationSec / 3600);
-
+    if (timelineData.length > 0) {
         new Chart(document.getElementById("chartTimeline"), {
             type: "bar",
             data: {
-                labels: timelineLabels,
+                labels: timelineData.map(t => t.dag),
                 datasets: [
-                    { label: "Início (offset)", data: startTimes, backgroundColor: "transparent", borderWidth: 0 },
-                    { label: "Duração", data: durations, backgroundColor: todayRuns.map(r => r.status === "success" ? chartColors.green : r.status === "failed" ? chartColors.red : chartColors.orange), borderRadius: 4 }
+                    { label: "Início", data: timelineData.map(t => t.start), backgroundColor: "transparent", borderWidth: 0 },
+                    { label: "Duração", data: timelineData.map(t => t.end - t.start), backgroundColor: timelineData.map(t => t.status === "running" ? chartColors.orange : chartColors.blue), borderRadius: 4 }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false, indexAxis: "y",
                 plugins: {
                     legend: { display: false },
-                    tooltip: { callbacks: { label: (ctx) => { if (ctx.datasetIndex === 0) return null; const run = todayRuns[ctx.dataIndex]; return `${run.start} -> ${run.end} (${formatDuration(run.durationSec)})`;} } }
+                    tooltip: { callbacks: { label: (ctx) => { if (ctx.datasetIndex === 0) return null; const run = todayRuns[ctx.dataIndex]; return `${run.start} -> ${run.end} (${formatDuration(run.durationSec)})`; } } }
                 },
                 scales: {
                     x: { stacked: true, title: { display: true, text: "Hora (BRT)" }, ticks: { callback: v => `${Math.floor(v)}:00` } },
